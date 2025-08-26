@@ -1,0 +1,134 @@
+﻿@using Microsoft.AspNetCore.Http
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - WebBanPizza</title>
+
+    <link rel="stylesheet" href="~/css/orders.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin-pizza.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/add-pizza.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css?v=2" />
+    <link rel="stylesheet" href="~/WebBanPizza.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/search.css" />
+
+    @RenderSection("Styles", required: false)
+</head>
+<body class="@(ViewData["BodyClass"])">
+    <header class="sticky-top">
+        <div class="topbar py-1">
+            <div class="container-xl d-flex justify-content-between">
+                <div>📍 Giao nhanh trong 30 phút</div>
+                <div>📞 Hotline: 1900 1234</div>
+            </div>
+        </div>
+
+        <nav class="navbar navbar-expand-lg navbar-pc">
+            <div class="container-xl">
+                <a class="navbar-brand fw-bold d-flex align-items-center gap-2"
+                   asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo-moi.png" alt="The Pizza House" width="80" height="40" asp-append-version="true">
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                        </li>
+                        <!-- MENU trỏ về trang lọc -->
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Pizza" asp-action="Loc">Menu</a>
+                        </li>
+                        @* ĐÃ BỎ: Khuyến mãi *@
+
+                        @{
+                            var isAdmin = string.Equals(
+                            Context.Session.GetString("VaiTro"),
+                            "Admin",
+                            StringComparison.OrdinalIgnoreCase
+                            );
+                        }
+                        @if (isAdmin)
+                        {
+                            <!-- Dropdown quản trị -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    Quản trị
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="QuanLy" asp-action="Dashboard">Dashboard</a></li>
+                                    <li><a class="dropdown-item" asp-controller="QuanLy" asp-action="Pizza">Quản lý Pizza</a></li>
+                                    <li><a class="dropdown-item" asp-controller="QuanLy" asp-action="Coupon">Mã giảm giá</a></li>
+                                    <li><a class="dropdown-item" asp-controller="QuanLy" asp-action="DonHang">Quản lý đơn hàng</a></li>
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+
+                    <!-- Form tìm kiếm trỏ về Pizza/Loc -->
+                    <form asp-controller="Pizza" asp-action="Loc" method="get" class="d-flex me-2" role="search">
+                        <input name="keyword" class="form-control form-control-sm me-2" type="search" placeholder="Tìm pizza..." />
+                        <button class="btn btn-outline-light btn-sm">Tìm</button>
+                    </form>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <a class="btn btn-light btn-sm" asp-controller="GioHang" asp-action="Index">🛒 Giỏ hàng</a>
+                        @if (Context.Session.GetInt32("UserId") != null)
+                        {
+                            <a class="btn btn-link btn-sm" asp-controller="DonHang" asp-action="Index">Đơn hàng</a>
+                            <span class="btn btn-link btn-sm text-white text-opacity-75 text-decoration-none">
+                                👤 @Context.Session.GetString("HoTen")
+                            </span>
+                            <a class="btn btn-cta btn-sm" asp-controller="Account" asp-action="DangXuat">Đăng xuất</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-cta btn-sm" asp-controller="Account" asp-action="DangNhap">Đăng nhập</a>
+                            <a class="btn btn-light btn-sm" asp-controller="Account" asp-action="DangKy">Đăng ký</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-xl">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <main role="main" class="py-4">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top py-4">
+        <div class="container-xl small text-muted d-flex justify-content-between">
+            <span>© @DateTime.Now.Year - WebBanPizza</span>
+            <a asp-controller="Home" asp-action="Privacy" class="text-muted">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

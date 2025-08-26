@@ -1,0 +1,59 @@
+﻿@model List<WebBanPizza.Models.DonHang>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Mã</th>
+            <th>Ngày đặt</th>
+            <th>Địa chỉ giao</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+            <th>Thanh toán</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model)
+        {
+            var daTT = d.DaThanhToan
+            || string.Equals(d.TrangThai ?? "", "Hoàn tất", StringComparison.OrdinalIgnoreCase);
+
+            <tr>
+                <td>@d.DonHangId</td>
+
+                <td>@(d.NgayDat?.ToString("dd/MM/yyyy HH:mm"))</td>
+
+                <td>
+                    @if (d.DiaChi != null)
+                    {
+                        <text>
+                            <b>@d.DiaChi.HoTen</b> - @d.DiaChi.SDT<br />
+                            @d.DiaChi.Duong, @d.DiaChi.QuanHuyen
+                        </text>
+                    }
+                    else
+                    {
+                        <text>
+                            <b>@(d.TenNguoiNhan ?? "-")</b> - @(d.SDTNguoiNhan ?? "-")<br />
+                            @(d.DiaChiGiao ?? "-")
+                        </text>
+                    }
+                </td>
+
+                <td>@String.Format("{0:N0} đ", d.TongTien ?? 0m)</td>
+                <td>@(d.TrangThai ?? "-")</td>
+                <td>
+                    @if (!daTT)
+                    {
+                        <a class="btn btn-sm btn-outline-primary"
+                           asp-controller="Payment" asp-action="Qr" asp-route-id="@d.DonHangId">
+                            🧾 Thanh toán QR
+                        </a>
+                    }
+                    <span class="badge @(daTT ? "bg-success" : "bg-warning text-dark") ms-2">
+                        @(daTT ? "đã thanh toán" : "chưa thanh toán")
+                    </span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

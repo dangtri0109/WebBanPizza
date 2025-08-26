@@ -1,0 +1,288 @@
+﻿:root {
+    --pc-green: #006341;
+    --pc-green-700: #004f33;
+    --pc-red: #c8102e;
+    --pc-cream: #fff7e6;
+    --ink: #0f172a;
+    --muted: #6b7280;
+}
+
+/* nền dịu + pattern nhẹ */
+body.pizza-detail-page {
+    background: radial-gradient(1200px 600px at 20% -10%, #ffffff40 0 30%, transparent 31% 100%), radial-gradient(1200px 600px at 90% -10%, #ffffff30 0 28%, transparent 29% 100%), linear-gradient(180deg,#faf7ef 0%, #f6efe3 45%, #efe6d6 100%);
+    color: var(--ink);
+}
+
+/* khung tổng thể, canh rộng hơn 1 chút */
+.detail-shell {
+    max-width: 1120px;
+    margin-inline: auto;
+}
+
+/* card glass */
+.pizza-detail {
+    background: color-mix(in srgb, var(--pc-cream) 88%, #fff 12%);
+    border-radius: 26px;
+    padding: 28px;
+    box-shadow: 0 16px 40px rgba(0,0,0,.10);
+    backdrop-filter: blur(2px);
+}
+
+/* ảnh */
+.pizza-img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 20px;
+    box-shadow: 0 12px 34px rgba(0,0,0,.14);
+}
+
+/* tiêu đề có gạch gradient */
+.pizza-title {
+    font-weight: 900;
+    letter-spacing: .2px;
+    line-height: 1.2;
+    position: relative;
+    display: inline-block;
+    padding-bottom: .2rem;
+}
+
+    .pizza-title:after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -6px;
+        height: 6px;
+        border-radius: 6px;
+        background: linear-gradient(90deg, var(--pc-green) 0%, #12a579 50%, #22c55e 100%);
+        opacity: .25;
+    }
+
+/* mô tả */
+.pizza-meta {
+    color: var(--muted)
+}
+
+/* price pill */
+.price {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: 2.1rem;
+    font-weight: 900;
+    color: var(--pc-green-700);
+    background: #eaf6f1;
+    border-radius: 14px;
+    padding: .35rem .9rem;
+}
+
+/* nút CTA nổi */
+.btn-cta {
+    background: var(--pc-red);
+    color: #fff;
+    border: 0;
+    font-weight: 800;
+    padding: .8rem 1.25rem;
+    border-radius: 14px;
+    box-shadow: 0 10px 22px rgba(200,16,46,.28);
+    transform: translateY(0);
+    transition: transform .15s ease, box-shadow .15s ease, filter .2s;
+}
+
+    .btn-cta:hover {
+        transform: translateY(-2px);
+        filter: brightness(.97);
+    }
+
+.btn-outline {
+    border: 2px solid var(--pc-green);
+    color: var(--pc-green);
+    font-weight: 700;
+    border-radius: 14px;
+    background: #fff;
+}
+
+    .btn-outline:hover {
+        background: var(--pc-green);
+        color: #fff
+    }
+
+/* chip size */
+.size-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem
+}
+
+.size-chip {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: .55rem .9rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+    .size-chip:checked {
+        border-color: var(--pc-green);
+        color: #fff;
+        background: var(--pc-green);
+    }
+
+/* qty stepper */
+.qty {
+    display: flex;
+    align-items: center;
+    gap: .5rem
+}
+
+    .qty button {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: 2px solid #e5e7eb;
+        background: #fff;
+        font-weight: 800;
+    }
+
+    .qty input {
+        width: 76px;
+        text-align: center;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        height: 40px;
+    }
+
+/* gạch chia mềm */
+.hr-soft {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+}
+
+/* list benefit */
+.benefits {
+    color: #64748b
+}
+
+    .benefits li {
+        margin-bottom: .35rem
+    }
+
+/* responsive tweak */
+@media (max-width: 991.98px) {
+    .pizza-detail {
+        padding: 20px
+    }
+
+    .price {
+        font-size: 1.8rem
+    }
+}
+.detail-wrapper {
+    min-height: calc(100vh - 120px); /* trừ chiều cao header/footer */
+    display: flex;
+    align-items: center; /* căn giữa theo chiều dọc */
+    justify-content: center; /* căn giữa theo chiều ngang */
+    padding: 20px;
+}
+
+
+/* wwwroot/css/pizza-details.css */
+
+.rating-wrap {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.stars {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+    .stars .on {
+        color: #f5a623;
+    }
+
+    .stars .off {
+        color: #d8d8d8;
+    }
+
+.rating-text {
+    font-weight: 600;
+}
+
+.review-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+    .review-card .who {
+        font-weight: 600;
+    }
+
+    .review-card .when {
+        color: #888;
+        font-size: .9rem;
+    }
+
+.review-form {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.hr-soft {
+    border: 0;
+    border-top: 1px solid #f0f0f0;
+}
+
+.qty {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+    .qty button {
+        width: 36px;
+        height: 36px;
+        border: 0;
+        background: #f7f7f7;
+        cursor: pointer;
+    }
+
+    .qty input {
+        width: 60px;
+        height: 36px;
+        border: 0;
+        text-align: center;
+    }
+
+.btn-cta {
+    background: #d62828;
+    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    padding: .6rem 1rem;
+}
+
+.btn-outline {
+    border: 1px solid #0b7b53;
+    border-radius: 999px;
+    padding: .55rem 1rem;
+    background: #fff;
+    color: #0b7b53;
+}
+
+.benefits li {
+    margin-bottom: .25rem;
+}

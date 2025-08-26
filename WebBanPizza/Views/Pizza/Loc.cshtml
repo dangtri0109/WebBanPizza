@@ -1,0 +1,58 @@
+﻿@model WebBanPizza.Models.PizzaFilterVM
+
+<h3>Lọc Pizza</h3>
+<form method="get" asp-action="Loc" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <input name="keyword" value="@Model.Keyword" class="form-control" placeholder="Từ khóa..." />
+    </div>
+    <div class="col-md-2">
+        <select name="danhMucId" class="form-select">
+            <option value="">-- Danh mục --</option>
+            @foreach (var dm in Model.DanhMucs)
+            {
+                <option value="@dm.DanhMucId" selected="@(Model.DanhMucId==dm.DanhMucId)">
+                    @dm.TenDanhMuc
+                </option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="kichThuoc" class="form-select">
+            <option value="">-- Size --</option>
+            <option value="S" selected="@(Model.KichThuoc == "S")">S</option>
+            <option value="M" selected="@(Model.KichThuoc == "M")">M</option>
+            <option value="L" selected="@(Model.KichThuoc == "L")">L</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input name="giaMin" type="number" value="@(Model.GiaMin)" class="form-control" placeholder="Giá từ" />
+    </div>
+    <div class="col-md-2">
+        <input name="giaMax" type="number" value="@(Model.GiaMax)" class="form-control" placeholder="Giá đến" />
+    </div>
+    <div class="col-md-1">
+        <button class="btn btn-primary w-100">Lọc</button>
+    </div>
+</form>
+
+<div class="row">
+    @foreach (var item in Model.KetQua)
+    {
+        var needsZoom = (item.HinhAnh?.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ?? false);
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm rounded-4 overflow-hidden">
+                <div class="pizza-thumb">
+                    <img src="~/images/@item.HinhAnh"
+                         alt="@item.Ten"
+                         class="@(needsZoom ? "fit-zoom" : "")" />
+                </div>
+                <div class="card-body">
+                    <h5>@item.Ten</h5>
+                    <div>Size: @item.KichThuoc</div>
+                    <div class="text-danger fw-bold">@string.Format("{0:N0} đ", item.Gia)</div>
+                    <a asp-action="Details" asp-route-id="@item.PizzaId" class="btn btn-sm btn-outline-primary mt-2">Xem</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

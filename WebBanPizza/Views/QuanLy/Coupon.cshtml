@@ -1,0 +1,50 @@
+﻿@model IEnumerable<WebBanPizza.Models.Coupon>
+@{
+    ViewData["Title"] = "Mã giảm giá";
+}
+
+<h2 class="mb-3">🎟 Danh sách mã giảm giá</h2>
+
+<div class="mb-3">
+    <a asp-action="TaoCoupon" class="btn btn-primary">+ Tạo mã mới</a>
+</div>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>Mã</th>
+            <th>Giảm (%)</th>
+            <th>Ngày hết hạn</th>
+            <th style="width:160px">Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.CouponId</td>
+                    <td>@c.Ma</td>
+                    <td>@c.GiamGiaPhanTram</td>
+                    <td>@(c.NgayHetHan?.ToString("dd/MM/yyyy"))</td>
+                    <td>
+                        <a asp-action="SuaCoupon" asp-route-id="@c.CouponId" class="btn btn-sm btn-warning">Sửa</a>
+                        <form asp-action="XoaCoupon" asp-route-id="@c.CouponId" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Xoá mã này?');">
+                                Xoá
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr><td colspan="5" class="text-center text-muted">Chưa có mã nào.</td></tr>
+        }
+    </tbody>
+</table>

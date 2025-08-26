@@ -1,0 +1,34 @@
+﻿@model List<WebBanPizza.Models.DonHang>
+
+<h2>🛠 Quản lý đơn hàng</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Người đặt</th>
+            <th>Ngày đặt</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model)
+        {
+            <tr>
+                <td>#@d.DonHangId</td>
+                <td>@d.User?.HoTen</td> <!-- Sửa lại đúng tên property -->
+                <td>@(d.NgayDat.HasValue? d.NgayDat.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                <td>@String.Format("{0:N0} đ", d.TongTien)</td>
+                <td>@d.TrangThai</td>
+                <td>
+                    <a asp-action="DoiTrangThai" asp-route-id="@d.DonHangId" asp-route-trangThai="Đang giao" class="btn btn-sm btn-warning">Giao hàng</a>
+                    <a asp-action="DoiTrangThai" asp-route-id="@d.DonHangId" asp-route-trangThai="Hoàn tất" class="btn btn-sm btn-success">Hoàn tất</a>
+                </td>
+            </tr>
+        }
+        <small class="text-muted">DB: @ViewBag.Conn</small>
+
+    </tbody>
+</table>

@@ -1,0 +1,28 @@
+﻿@model WebBanPizza.Models.NguoiDung
+
+<h2>Đăng ký tài khoản</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<form asp-action="DangKy" method="post">
+    <div class="form-group">
+        <label>Họ tên</label>
+        <input asp-for="HoTen" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <input asp-for="Email" class="form-control" type="email" required />
+    </div>
+    <div class="form-group">
+        <label>Mật khẩu</label>
+        <input asp-for="MatKhau" class="form-control" type="password" required />
+    </div>
+    <button type="submit" class="btn btn-success mt-2">Đăng ký</button>
+</form>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/register.css" asp-append-version="true" />
+}

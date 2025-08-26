@@ -1,0 +1,193 @@
+﻿@model List<WebBanPizza.Models.CartItem>
+@{
+    ViewData["Title"] = "Giỏ hàng";
+
+    var giamPct = (int)(ViewBag.GiamGiaPhanTram ?? 0);
+
+    var soLuongSP = (ViewBag.TongSoLuong as int?) ?? (Model?.Sum(x => x.SoLuong) ?? 0);
+    var soMatHang = Model?.Count ?? 0;
+
+    decimal tongHang = Model?.Sum(x => x.SoLuong * (x.Pizza.Gia)) ?? 0m;
+    decimal giam = tongHang * giamPct / 100m;
+    decimal thanhTien = Math.Max(0, tongHang - giam);
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/cart.css" asp-append-version="true" />
+}
+
+<section class="container-xl my-4 cart-page">
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <span class="display-6 lh-1">🛒</span>
+        <h1 class="h3 mb-0 fw-bold">Giỏ hàng của bạn</h1>
+        <span class="badge bg-success ms-2">@soLuongSP</span>
+        <small class="text-muted">sản phẩm (@soMatHang mặt hàng)</small>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success shadow-sm rounded-3">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger shadow-sm rounded-3">@TempData["Error"]</div>
+    }
+
+    <div class="row g-4">
+        <!-- LEFT: cart items -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-0">
+                    @if (Model == null || !Model.Any())
+                    {
+                        <div class="p-5 text-center">
+                            <div class="fs-5 mb-2">Giỏ hàng trống</div>
+                            <a class="btn btn-primary rounded-pill px-4" asp-controller="Pizza" asp-action="Index">Tiếp tục mua sắm</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="table align-middle mb-0 cart-table">
+                            <thead class="table-light">
+                                <tr class="text-muted">
+                                    <th class="col-img">Hình</th>
+                                    <th class="col-title">Tên Pizza</th>
+                                    <th class="text-end col-price">Giá</th>
+                                    <th class="text-center col-qty">Số lượng</th>
+                                    <th class="text-end col-sub">Thành tiền</th>
+                                    <th class="col-actions"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var it in Model)
+                                {
+                                    <tr>
+                                        <!-- Ảnh gọn -->
+                                        <td class="col-img">
+                                            <img src="~/images/@it.Pizza.HinhAnh"
+                                                 alt="@it.Pizza.Ten"
+                                                 class="cart-thumb-compact" />
+                                        </td>
+
+                                        <!-- Tên + mô tả + GHI CHÚ -->
+                                        <td class="col-title">
+                                            <div class="cart-name">@it.Pizza.Ten</div>
+                                            <div class="cart-meta">Đế truyền thống • Phô mai mozzarella</div>
+
+                                            <!-- 🔶 NEW: Khung ghi chú cho món -->
+                                            <form asp-action="CapNhatGhiChu" method="post" class="mt-2 d-flex gap-2 align-items-start">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@it.Pizza.PizzaId" />
+                                                <textarea name="note"
+                                                  class="form-control form-control-sm"
+                                                  rows="2"
+                                                  maxlength="500"
+                                                  placeholder="Ghi chú món này (vd: ít phô mai, không ớt, cắt 10 miếng, giao sau 19:00)...">@it.GhiChu</textarea>
+                                                <button class="btn btn-outline-secondary btn-sm">Lưu</button>
+                                            </form>
+                                        </td>
+
+                                        <td class="text-end fw-semibold">@String.Format("{0:N0} đ", it.Pizza.Gia)</td>
+
+                                        <td>
+                                            <form asp-action="CapNhatSoLuong" method="post" class="d-flex justify-content-center gap-2">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@it.Pizza.PizzaId" />
+                                                <div class="input-group input-group-sm qty-group">
+                                                    <a class="btn btn-outline-secondary" href="#"
+                                                       onclick="const i=this.parentElement.querySelector('input');i.value=Math.max(1,parseInt(i.value||1)-1);return false;">−</a>
+                                                    <input class="form-control text-center" type="number" min="1" name="soLuong" value="@it.SoLuong" />
+                                                    <a class="btn btn-outline-secondary" href="#"
+                                                       onclick="const i=this.parentElement.querySelector('input');i.value=parseInt(i.value||1)+1;return false;">＋</a>
+                                                </div>
+                                                <button class="btn btn-primary btn-sm">Cập nhật</button>
+                                            </form>
+                                        </td>
+
+                                        <td class="text-end fw-semibold">@String.Format("{0:N0} đ", it.SoLuong * it.Pizza.Gia)</td>
+
+                                        <td class="text-end">
+                                            <a class="btn btn-danger btn-sm" asp-action="XoaKhoiGio" asp-route-id="@it.Pizza.PizzaId">
+                                                🗑 Xóa
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: summary -->
+        <div class="col-lg-4">
+            <!-- Coupon -->
+            <div class="card border-0 shadow-sm rounded-4 mb-3 coupon">
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span>🔑</span><div class="fw-semibold">Mã giảm giá</div>
+                        @if (ViewBag.MaGiamGia != null)
+                        {
+                            <span class="badge bg-success-subtle text-success ms-auto">
+                                Đang áp dụng: @ViewBag.MaGiamGia (@giamPct%)
+                            </span>
+                        }
+                    </div>
+
+                    <form asp-action="ApDungMaGiamGia" method="post" class="d-flex gap-2 mb-2">
+                        @Html.AntiForgeryToken()
+                        <input name="maGiamGia" class="form-control" placeholder="Nhập mã giảm giá…" />
+                        <button class="btn btn-outline-primary">Áp dụng</button>
+                    </form>
+
+                    @if (ViewBag.MaGiamGia != null)
+                    {
+                        <form asp-action="HuyMaGiamGia" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-link p-0 text-danger">Hủy mã</button>
+                        </form>
+                    }
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="card border-0 shadow-sm rounded-4 sticky-lg-top summary-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Số lượng</span>
+                        <strong>@soLuongSP</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Tổng tiền</span>
+                        <strong>@String.Format("{0:N0} đ", tongHang)</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Giảm giá</span>
+                        <strong class="text-success">-@String.Format("{0:N0} đ", giam)</strong>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between fs-5 mb-3">
+                        <span>💰 Thành tiền</span>
+                        <strong class="text-danger">@String.Format("{0:N0} đ", thanhTien)</strong>
+                    </div>
+
+                    <form asp-action="ThanhToan" method="post" class="vstack gap-2">
+                        @Html.AntiForgeryToken()
+                        <input class="form-control" name="tenNguoiNhan" placeholder="Tên người nhận" required />
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <input class="form-control" name="sdtNguoiNhan" placeholder="Số điện thoại" required />
+                            </div>
+                        </div>
+                        <input class="form-control" name="diaChiGiao" placeholder="Số nhà, đường, phường/xã, quận/huyện" required />
+
+                        <button class="btn btn-success btn-lg w-100 rounded-pill mt-2">
+                            ✅ Đặt hàng
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

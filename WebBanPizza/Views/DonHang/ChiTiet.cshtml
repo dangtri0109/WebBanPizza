@@ -1,0 +1,134 @@
+﻿@model WebBanPizza.Models.DonHang
+@using System.Globalization
+
+@{
+    ViewData["Title"] = $"Chi tiết đơn hàng #{Model?.DonHangId}";
+    string VND(decimal v) => string.Format(CultureInfo.GetCultureInfo("vi-VN"), "{0:N0} đ", v);
+
+    string Badge(string? s)
+    {
+        s = (s ?? "").Trim();
+        if (s.Equals("Hoàn tất", StringComparison.OrdinalIgnoreCase)) return "done";
+        if (s.Contains("Hủy") || s.Contains("Huỷ")) return "cancel";
+        if (s.Contains("Đang giao")) return "shipping";
+        return "processing";
+    }
+
+    decimal subTotal = 0;
+    if (Model?.ChiTietDonHangs != null)
+    {
+        foreach (var ct in Model.ChiTietDonHangs)
+        {
+            var sl = (ct.SoLuong);
+            var gia = (ct.Gia);
+            subTotal += (decimal)sl * gia;
+        }
+    }
+    decimal ship = 0;
+    decimal giam = 0;
+    decimal grand = Model?.TongTien ?? (subTotal + ship - giam);
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/order-detail.css" asp-append-version="true" />    
+}
+
+<section class="order-detail container-xl py-4">
+    <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="od-icon"><span>🧾</span></div>
+        <h1 class="h3 mb-0">Chi tiết đơn hàng <span class="order-code">#@Model?.DonHangId</span></h1>
+        <div class="ms-auto">
+            <a asp-action="Index" class="btn btn-outline-secondary">← Danh sách đơn hàng</a>
+        </div>
+    </div>
+
+    <div class="od-summary card shadow-sm rounded-4 mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="sum-item">
+                        <div class="label">Ngày đặt</div>
+                        <div class="value">@Model?.NgayDat?.ToString("dd/MM/yyyy HH:mm")</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="sum-item">
+                        <div class="label">Trạng thái</div>
+                        <div class="value">
+                            <span class="badge-status @Badge(Model?.TrangThai)">
+                                @(Model?.TrangThai ?? "Đang xử lý")
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="sum-item total">
+                        <div class="label">Tổng tiền</div>
+                        <div class="value text-danger fw-bold">@VND(grand)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table od-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Pizza</th>
+                            <th class="text-center" style="width:130px">Số lượng</th>
+                            <th class="text-end" style="width:160px">Đơn giá</th>
+                            <th class="text-end" style="width:180px">Thành tiền</th>
+                            <th style="width:200px">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.ChiTietDonHangs != null)
+                        {
+                            foreach (var ct in Model.ChiTietDonHangs)
+                            {
+                                var thanhTien = (decimal)ct.SoLuong * ct.Gia;
+                                <tr>
+                                    <td>@ct.Pizza.Ten</td>
+                                    <td class="text-center">@ct.SoLuong</td>
+                                    <td class="text-end">@VND(ct.Gia)</td>
+                                    <td class="text-end fw-semibold">@VND(thanhTien)</td>
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(ct.GhiChu))
+                                        {
+                                            <span class="note-pill">@ct.GhiChu</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="text-end text-muted">Tạm tính</td>
+                            <td class="text-end">@VND(subTotal)</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-end text-muted">Phí ship</td>
+                            <td class="text-end">@VND(ship)</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-end text-muted">Giảm giá</td>
+                            <td class="text-end">- @VND(giam)</td>
+                        </tr>
+                        <tr class="grand">
+                            <td colspan="4" class="text-end fw-bold">Tổng cộng</td>
+                            <td class="text-end fw-bold text-danger">@VND(grand)</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

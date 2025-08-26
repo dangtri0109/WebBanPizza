@@ -1,0 +1,120 @@
+﻿@model WebBanPizza.Models.PizzaUploadViewModel
+@{
+    ViewData["Title"] = "Sửa Pizza";
+}
+
+<div class="container-xl admin-page py-4">
+    <div class="page-title d-flex align-items-center gap-3 mb-3">
+        <div class="title-dot"></div>
+        <h2 class="m-0">Sửa Pizza</h2>
+    </div>
+
+    <form asp-action="SuaPizza" method="post" enctype="multipart/form-data" class="row g-4">
+        @Html.AntiForgeryToken()
+        <input asp-for="PizzaId" type="hidden" />
+        <input asp-for="HinhAnhCu" type="hidden" />
+
+        <!-- LEFT -->
+        <div class="col-lg-8">
+            <div class="card card-soft shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label fw-600">Tên</label>
+                            <input asp-for="Ten" class="form-control form-control-lg" />
+                            <span asp-validation-for="Ten" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-600">Giá</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₫</span>
+                                <input asp-for="Gia" class="form-control" id="giaField" />
+                            </div>
+                            <span asp-validation-for="Gia" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-600">Danh mục</label>
+                            <select asp-for="DanhMucId" asp-items="ViewBag.DanhMucs" class="form-select"></select>
+                            <span asp-validation-for="DanhMucId" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label fw-600">Mô tả</label>
+                        <textarea asp-for="MoTa" class="form-control" rows="4" maxlength="500" id="motaField"></textarea>
+                        <div class="form-text text-end"><span id="motaCount">0</span>/500</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="col-lg-4">
+            <div class="card card-soft shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <label class="form-label fw-600 d-block">Hình hiện tại</label>
+                    @if (!string.IsNullOrEmpty(Model.HinhAnhCu))
+                    {
+                        <img src="~/images/@Model.HinhAnhCu" alt="img" class="img-preview mb-3" style="height:200px" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">(Chưa có)</span>
+                    }
+
+                    <label class="form-label fw-600 mt-2">Chọn hình mới (nếu muốn đổi)</label>
+                    <label class="upload-dropzone w-100" for="fileInput">
+                        <input asp-for="HinhAnhUpload" id="fileInput" type="file" class="d-none" accept=".jpg,.jpeg,.png,.gif,.webp" />
+                        <div class="dz-in">
+                            <div class="dz-icon">📷</div>
+                            <div>Thả ảnh vào đây hoặc <span class="link">chọn ảnh</span></div>
+                        </div>
+                        <img id="preview" class="img-preview d-none" alt="preview" />
+                    </label>
+                    <span asp-validation-for="HinhAnhUpload" class="text-danger small"></span>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-cta">Cập nhật</button>
+                        <a asp-action="Pizza" class="btn btn-outline-secondary">Quay lại</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Format giá
+        const gia = document.getElementById('giaField');
+        gia?.addEventListener('input', () => {
+            let v = gia.value.replace(/[^\d.]/g, '');
+            const p = v.split('.');
+            if (p.length > 2) v = p[0] + '.' + p.slice(1).join('');
+            gia.value = v;
+        });
+
+        // Đếm mô tả
+        const mota = document.getElementById('motaField'), c = document.getElementById('motaCount');
+        if (mota && c) { const upd = () => c.textContent = mota.value.length; mota.addEventListener('input', upd); upd(); }
+
+        // Preview ảnh mới
+        const input = document.getElementById('fileInput'), preview = document.getElementById('preview'), dz = document.querySelector('.upload-dropzone');
+        function showPreview(file) {
+            if (!file) return;
+            if (!/image\/(png|jpeg|jpg|gif|webp)/.test(file.type)) { alert('File ảnh không hợp lệ'); input.value = ''; return; }
+            const r = new FileReader();
+            r.onload = e => { preview.src = e.target.result; preview.classList.remove('d-none'); dz.classList.add('has-image'); };
+            r.readAsDataURL(file);
+        }
+        input?.addEventListener('change', e => showPreview(e.target.files[0]));
+        ['dragover','dragenter'].forEach(ev => dz?.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('dragging'); }));
+        ['dragleave','drop'].forEach(ev => dz?.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('dragging'); }));
+        dz?.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) { input.files = e.dataTransfer.files; showPreview(f); } });
+    </script>
+}

@@ -1,0 +1,64 @@
+﻿@model List<WebBanPizza.Models.DiaChi>
+
+<h3>📦 Địa chỉ giao hàng</h3>
+
+<!-- Hiển thị thông báo -->
+@if (TempData["Error"] is string e)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @e
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Success"] is string s)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @s
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<a asp-action="Tao" class="btn btn-primary mb-2">➕ Thêm địa chỉ</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Người nhận</th>
+            <th>SĐT</th>
+            <th>Địa chỉ</th>
+            <th>Quận/Huyện</th>
+            <th>Mặc định</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model)
+        {
+            <tr>
+                <td>@a.HoTen</td>
+                <td>@a.SDT</td>
+                <td>@a.Duong</td>
+                <td>@a.QuanHuyen</td>
+                <td>@(a.MacDinh ? "✔" : "")</td>
+                <td class="text-nowrap">
+                    <a asp-action="Sua" asp-route-id="@a.DiaChiId" class="btn btn-sm btn-warning">Sửa</a>
+
+                    <form asp-action="Xoa" method="post" class="d-inline" onsubmit="return confirm('Xóa địa chỉ?');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@a.DiaChiId" />
+                        <button class="btn btn-sm btn-danger" type="submit">Xóa</button>
+                    </form>
+
+                    @if (!a.MacDinh)
+                    {
+                        <form asp-action="DatMacDinh" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@a.DiaChiId" />
+                            <button class="btn btn-sm btn-secondary">Đặt mặc định</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

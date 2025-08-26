@@ -1,0 +1,214 @@
+﻿/* ===== Theme sáng: xanh lá + kem ===== */
+:root {
+    --pc-green: #0b7b53;
+    --pc-green-700: #086645;
+    --pc-yellow: #ffd166;
+    --pc-cream: #fff9f0;
+    --line: #e9edf2;
+}
+
+/* Header */
+.order-detail .od-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg,var(--pc-cream),#fff);
+    box-shadow: 0 4px 14px rgba(11,123,83,.12), inset 0 0 0 1px rgba(11,123,83,.2);
+    font-size: 22px;
+}
+
+.order-detail .order-code {
+    display: inline-block;
+    padding: .1rem .6rem;
+    border-radius: 999px;
+    background: #e8fff2;
+    border: 1px solid rgba(11,123,83,.25);
+    color: var(--pc-green-700);
+    font-weight: 700;
+}
+
+/* Summary */
+.od-summary .sum-item .label {
+    font-size: .85rem;
+    color: #6b7280;
+    margin-bottom: .25rem
+}
+
+.od-summary .sum-item .value {
+    font-weight: 600
+}
+
+.od-summary .sum-item.total .value {
+    font-size: 1.05rem
+}
+
+/* Status badge */
+.badge-status {
+    font-weight: 700;
+    font-size: .9rem;
+    padding: .35rem .7rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+}
+
+    .badge-status.done {
+        background: #e6fff5;
+        color: #065f46;
+        border-color: #86efac;
+    }
+
+    .badge-status.processing {
+        background: #fff9e6;
+        color: #7a4b00;
+        border-color: #ffdd99;
+    }
+
+    .badge-status.shipping {
+        background: #e6f5ff;
+        color: #004d73;
+        border-color: #99d0ff;
+    }
+
+    .badge-status.cancel {
+        background: #ffecec;
+        color: #b91c1c;
+        border-color: #fecaca;
+    }
+
+/* Card */
+.order-detail .card {
+    border: 0;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(2,6,23,.06);
+}
+
+/* Table */
+.od-table thead th {
+    background: linear-gradient(180deg,var(--pc-yellow),#ffe9b3);
+    color: #4a3c0a;
+    border-bottom: 2px solid var(--pc-green);
+    font-weight: 700;
+    letter-spacing: .2px;
+}
+
+.od-table tbody td {
+    border-color: var(--line);
+    padding-block: 12px;
+}
+
+.od-table tbody tr:nth-child(odd) td {
+    background: var(--pc-cream);
+}
+
+.od-table tbody tr:hover td {
+    background: #f3fff8;
+    transition: background .2s ease;
+}
+
+.od-table tfoot td {
+    border-top: 0;
+    padding-top: 12px
+}
+
+.od-table tfoot tr:not(.grand) td {
+    background: #fff;
+}
+
+.od-table tfoot tr.grand td {
+    background: #fffdf5;
+    border-top: 2px solid var(--pc-green);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .od-table thead {
+        display: none;
+    }
+
+    .od-table tbody tr {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        border-bottom: 1px solid var(--line);
+        padding: 10px 12px;
+    }
+
+    .od-table tbody td {
+        border: 0 !important;
+        padding: 4px 0;
+    }
+
+        .od-table tbody td:nth-child(1) {
+            order: 1;
+        }
+
+        .od-table tbody td:nth-child(2) {
+            order: 3;
+            text-align: center;
+        }
+
+        .od-table tbody td:nth-child(3) {
+            order: 2;
+            text-align: right;
+        }
+
+        .od-table tbody td:nth-child(4) {
+            order: 4;
+            text-align: right;
+        }
+}
+
+/* ==== ĐÁNH GIÁ SẢN PHẨM ==== */
+.stars {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+    .stars .on {
+        color: #f5a623;
+    }
+
+    .stars .off {
+        color: #ccc;
+    }
+
+.rating-text {
+    font-weight: 600;
+}
+
+.review-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 1rem;
+}
+
+    .review-card .who {
+        font-weight: 600;
+    }
+
+    .review-card .when {
+        color: #888;
+        font-size: 0.9rem;
+    }
+
+.review-form {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.hr-soft {
+    border: 0;
+    border-top: 1px solid #f0f0f0;
+}
+
+
+
+
+

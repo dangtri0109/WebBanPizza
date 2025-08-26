@@ -1,0 +1,71 @@
+﻿@model IEnumerable<WebBanPizza.Models.Pizza>
+@{
+    var keyword = (ViewBag.Keyword as string)?.Trim() ?? "";
+    ViewData["Title"] = "Kết quả tìm kiếm";
+    int count = Model?.Count() ?? 0;
+}
+
+<div class="container-xl search-page py-4">
+    <div class="d-flex align-items-end justify-content-between mb-3 title-wrap">
+        <div class="d-flex align-items-center gap-3">
+            <div class="title-dot"></div>
+            <h2 class="m-0">Kết quả tìm kiếm cho: <span class="kw">"@keyword"</span></h2>
+        </div>
+        <div class="text-muted">@count kết quả</div>
+    </div>
+
+    @if (count == 0)
+    {
+        <div class="empty-state text-center py-5">
+            <div class="emoji">🍕🔎</div>
+            <h4>Không tìm thấy pizza phù hợp</h4>
+            <p class="text-muted">Thử từ khóa khác, hoặc xem menu đầy đủ của chúng tôi.</p>
+            <a asp-controller="Pizza" asp-action="Index" class="btn btn-cta">Xem Menu</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var item in Model)
+            {
+                var img = string.IsNullOrWhiteSpace(item.HinhAnh) ? "no-image.png" : item.HinhAnh;
+                <div class="col-sm-6 col-lg-4">
+                    <div class="pizza-card card shadow-sm rounded-4 h-100">
+                        <div class="thumb">
+                            <img src="~/images/@img" alt="@item.Ten" loading="lazy" />
+                            <div class="corner-badge">Pizza</div>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title line-2">@item.Ten</h5>
+                            <p class="card-text text-muted line-2 mb-3">
+                                @(string.IsNullOrWhiteSpace(item.MoTa) ? " " : item.MoTa)
+                            </p>
+
+                            <div class="mt-auto d-flex align-items-center justify-content-between">
+                                <div class="price">@String.Format("{0:N0} ₫", item.Gia)</div>
+                                <a class="btn btn-outline-primary btn-sm"
+                                   asp-controller="Pizza" asp-action="Details" asp-route-id="@item.PizzaId">
+                                    Xem chi tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Highlight từ khóa trong tiêu đề (client-side, không phá vỡ server render)
+        (function () {
+            const kw = "@keyword".trim();
+            if (!kw) return;
+            const re = new RegExp("(" + kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "ig");
+            document.querySelectorAll(".pizza-card .card-title").forEach(el => {
+                el.innerHTML = el.textContent.replace(re, "<mark>$1</mark>");
+            });
+        })();
+    </script>
+}

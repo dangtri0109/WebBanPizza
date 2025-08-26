@@ -1,0 +1,44 @@
+﻿@model WebBanPizza.Models.Pizza
+
+@{
+    // Build đường dẫn ảnh an toàn
+    var f = Model.HinhAnh?.Trim();
+    string imgSrc;
+    if (string.IsNullOrWhiteSpace(f))
+        imgSrc = Url.Content("~/images/placeholder-pizza.jpg");      // chưa có ảnh
+    else if (f.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+        imgSrc = f;                                                  // URL tuyệt đối
+    else if (f.StartsWith("~/") || f.StartsWith("/"))
+        imgSrc = Url.Content(f);                                     // đã có path
+    else
+        imgSrc = Url.Content("~/images/" + f);                       // chỉ là tên file
+}
+
+<div class="card card-pizza h-100">
+    <div class="ratio ratio-4x3">
+        <img class="w-100 h-100 object-fit-cover"
+             src="@imgSrc"
+             alt="@(Model.Ten ?? "Pizza")"
+             onerror="this.onerror=null;this.src='@Url.Content("~/images/placeholder-pizza.jpg")';" />
+    </div>
+
+    <div class="card-body d-flex flex-column">
+        <h3 class="h6 fw-semibold mb-1 text-truncate">@Model.Ten</h3>
+        <p class="small text-secondary mb-2 text-truncate">@Model.MoTa</p>
+
+        <div class="d-flex gap-2 mb-2">
+            <span class="size-pill active" data-size="S">S</span>
+            <span class="size-pill" data-size="M">M</span>
+            <span class="size-pill" data-size="L">L</span>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between mt-auto">
+            <div class="price">@String.Format("{0:N0} đ", Model.Gia)</div>
+            <form asp-controller="GioHang" asp-action="ThemNhanh" method="post" class="m-0">
+                <input type="hidden" name="pizzaId" value="@Model.PizzaId" />
+                <input type="hidden" name="size" value="S" class="js-size" />
+                <button class="btn btn-cta btn-sm">Thêm</button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,33 @@
+﻿@model WebBanPizza.Models.Coupon
+@{
+    ViewData["Title"] = "Sửa mã giảm giá";
+}
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="SuaCoupon" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="CouponId" />
+    <div class="mb-2">
+        <label class="form-label">Mã</label>
+        <input asp-for="Ma" class="form-control" />
+        <span asp-validation-for="Ma" class="text-danger"></span>
+    </div>
+    <div class="mb-2">
+        <label class="form-label">% Giảm (1–100)</label>
+        <input asp-for="GiamGiaPhanTram" class="form-control" type="number" />
+        <span asp-validation-for="GiamGiaPhanTram" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Ngày hết hạn</label>
+        <input asp-for="NgayHetHan" class="form-control" type="date" />
+    </div>
+    <button class="btn btn-primary" type="submit">Lưu</button>
+    <a class="btn btn-secondary" asp-action="Coupons">Quay lại</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

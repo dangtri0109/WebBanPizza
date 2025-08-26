@@ -1,0 +1,31 @@
+﻿@{
+    var order = ViewBag.Order as WebBanPizza.Models.DonHang;
+}
+
+<h2>Thanh toán QR cho đơn #@order.DonHangId</h2>
+
+<div class="row">
+    <div class="col-md-5">
+        <img src="@ViewBag.QrUrl" alt="VietQR" class="img-fluid border rounded" />
+    </div>
+    <div class="col-md-7">
+        <ul class="list-group">
+            <li class="list-group-item"><strong>Số tiền:</strong> @String.Format("{0:N0} đ", order.TongTien)</li>
+            <li class="list-group-item"><strong>Nội dung:</strong> @ViewBag.AddInfo</li>
+            <li class="list-group-item"><strong>Tài khoản nhận:</strong> @ViewBag.Account</li>
+        </ul>
+        <p class="mt-3 text-muted">
+            Vui lòng quét mã bằng app ngân hàng. Sau khi chuyển khoản, hệ thống/nhân viên sẽ xác nhận và xử lý đơn.
+        </p>
+
+        @* Chỉ hiển thị nút xác nhận nếu là admin *@
+        @if (Context.Session.GetString("VaiTro") == "Admin")
+        {
+            <form asp-action="XacNhanDaThanhToan" method="post" class="mt-2">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@order.DonHangId" />
+                <button class="btn btn-success">Xác nhận đã nhận tiền</button>
+            </form>
+        }
+    </div>
+</div>

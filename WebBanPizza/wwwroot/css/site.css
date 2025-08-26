@@ -1,0 +1,355 @@
+﻿html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus,
+.form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem #fff, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+/* ===== Brand colors (Pizza Company vibe) ===== */
+:root {
+    --pc-green: #006341;
+    --pc-green-700: #004f33;
+    --pc-red: #c8102e;
+    --pc-cream: #fff7e6;
+}
+
+/* ===== Top utility bar ===== */
+.topbar {
+    background: #0b4f37;
+    color: #d1fae5;
+    font-size: .9rem;
+}
+
+/* ===== Navbar ===== */
+.navbar-pc {
+    background: var(--pc-green);
+}
+
+    .navbar-pc .navbar-brand,
+    .navbar-pc .nav-link,
+    .navbar-pc .btn-link {
+        color: #fff !important;
+    }
+
+        .navbar-pc .nav-link.active,
+        .navbar-pc .nav-link:hover {
+            color: #ffe082 !important;
+        }
+
+    /* Toggler icon & search trong nền tối */
+    .navbar-pc .navbar-toggler {
+        border-color: rgba(255,255,255,.35);
+    }
+
+    .navbar-pc .navbar-toggler-icon {
+        filter: invert(1);
+    }
+
+    .navbar-pc input.form-control {
+        background: #0e3d2c;
+        color: #fff;
+        border-color: #0e3d2c;
+    }
+
+        .navbar-pc input.form-control::placeholder {
+            color: #cfe6dc;
+        }
+
+/* ===== CTA buttons ===== */
+.btn-cta {
+    --bs-btn-bg: var(--pc-red);
+    --bs-btn-border-color: var(--pc-red);
+    --bs-btn-hover-bg: #a40d24;
+    --bs-btn-hover-border-color: #a40d24;
+    border-radius: 12px;
+    font-weight: 700;
+    box-shadow: 0 8px 16px rgba(200,16,46,.18);
+}
+
+    .btn-cta:focus {
+        box-shadow: 0 0 0 .2rem rgba(200,16,46,.35);
+    }
+
+/* ===== HERO ===== */
+.hero-pc {
+    background: radial-gradient(900px 420px at 15% 5%, rgba(255,230,200,.18), transparent 60%), linear-gradient(135deg, #0a7a51 0%, #006341 60%);
+    color: #fff;
+    border-radius: 1rem;
+    padding: clamp(1.75rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem);
+    border: 1px solid rgba(255,255,255,.06);
+}
+
+    .hero-pc .sub {
+        opacity: .9;
+    }
+
+    .hero-pc .btn-light {
+        background: #fff;
+        color: #0f172a;
+        border: 1px solid #e6e6e6;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+/* ===== Category tiles ===== */
+.tile {
+    background: #fff;
+    border-radius: 1rem;
+    border: 1px solid #eee;
+    padding: 1rem;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+    .tile img {
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+    }
+
+    .tile:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 24px rgba(0,0,0,.08);
+        border-color: #ffd9c2;
+    }
+
+/* ===== Product cards ===== */
+.card-pizza {
+    border: 1px solid #eee;
+    border-radius: 1rem;
+    overflow: hidden;
+    height: 100%;
+}
+
+    .card-pizza .ratio {
+        background: #fafafa;
+    }
+
+    .card-pizza .price {
+        color: var(--pc-green);
+        font-weight: 700;
+    }
+
+.badge-discount {
+    background: var(--pc-red);
+    color: #fff;
+}
+
+/* Size pills trên card */
+.size-pill {
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    padding: .2rem .6rem;
+    font-size: .85rem;
+    cursor: pointer;
+    user-select: none;
+    transition: all .15s ease;
+}
+
+    .size-pill.active {
+        background: var(--pc-green);
+        color: #fff;
+        border-color: var(--pc-green);
+    }
+
+/* ===== Misc ===== */
+@media (max-width: 991.98px) {
+    .hero-pc {
+        padding: 1.25rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tile, .size-pill {
+        transition: none;
+    }
+}
+
+/* ===== Coming Soon Cards ===== */
+.pc-card-comingsoon {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+    .pc-card-comingsoon:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .pc-card-comingsoon .pc-thumb {
+        position: relative;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: #f7f7f7;
+        height: 250px; /* Chiều cao cố định cho ảnh */
+    }
+
+        .pc-card-comingsoon .pc-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cắt ảnh đều khung */
+            display: block;
+            filter: brightness(0.9);
+            transition: transform .35s ease, filter .35s ease;
+        }
+
+    .pc-card-comingsoon:hover .pc-thumb img {
+        transform: scale(1.05);
+        filter: brightness(1);
+    }
+
+    .pc-card-comingsoon .pc-badge {
+        position: absolute;
+        top: .6rem;
+        left: .6rem;
+        background: var(--pc-red);
+        color: #fff;
+        font-size: .75rem;
+        font-weight: 700;
+        padding: .35rem .6rem;
+        border-radius: .5rem;
+    }
+
+    .pc-card-comingsoon .pc-body {
+        text-align: center;
+    }
+
+        .pc-card-comingsoon .pc-body h5 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--pc-green);
+        }
+
+        .pc-card-comingsoon .pc-body p {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .pc-card-comingsoon .pc-body small {
+            font-size: 0.8rem;
+            color: var(--pc-red);
+            font-weight: 600;
+        }
+
+/* ===== Pizza image cover (dùng cho list/menu) ===== */
+.pizza-thumb {
+    position: relative;
+    height: 250px; /* muốn thấp/cao hơn thì đổi số này */
+    overflow: hidden;
+    background: #f7f7f7;
+    border-bottom: 1px solid #eee;
+    border-radius: 1rem 1rem 0 0; /* khớp card bo góc */
+}
+
+    .pizza-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* >>> làm ảnh đầy khung như ảnh thứ 2 */
+        display: block;
+        transition: transform .3s ease, filter .3s ease;
+        filter: brightness(.95);
+    }
+
+        /* Tùy chọn: “zoom” riêng cho ảnh PNG bị nhiều khoảng trống */
+        .pizza-thumb img.fit-zoom {
+            transform: scale(1.3); /* tăng/giảm 1.15–1.5 tùy mắt nhìn */
+        }
+
+/* ===== Hero video (thêm mới) ===== */
+.hero-video {
+    position: relative;
+    overflow: hidden; /* để bo góc theo .rounded-4 */
+    border-radius: 1rem;
+}
+
+    .hero-video video {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover; /* lấp đầy khung */
+        aspect-ratio: 5/3; /* nhìn cân đối với hero desktop */
+        border-radius: 1rem;
+    }
+
+@media (max-width: 991.98px) {
+    .hero-video video {
+        aspect-ratio: 16/9;
+    }
+    /* mobile/tablet */
+}
+
+
+/* ===== Footer Contact ===== */
+.footer-pc {
+    background: linear-gradient(180deg, #0b4f37 0%, #064e3b 100%);
+    color: #e6fffb;
+    padding: 36px 0 28px;
+    border-radius: 1rem;
+}
+
+    .footer-pc .footer-link {
+        color: #b7f0e5;
+    }
+
+        .footer-pc .footer-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+    .footer-pc .loc-dot {
+        width: 38px;
+        height: 38px;
+        margin: 0 auto 8px;
+        border-radius: 50%;
+        background: var(--pc-red);
+        color: #fff;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 14px rgba(200,16,46,.25);
+    }
+
+    .footer-pc .addr {
+        font-weight: 600;
+        min-height: 40px;
+    }
+
+    .footer-pc .map-link {
+        display: inline-block;
+        margin-top: 4px;
+        color: #ffd166;
+        text-decoration: none;
+        font-size: .9rem;
+    }
+
+        .footer-pc .map-link:hover {
+            text-decoration: underline;
+            color: #ffec99;
+        }
+
+.footer-hr {
+    border-color: rgba(255,255,255,.15);
+    opacity: 1;
+}
+
+

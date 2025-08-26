@@ -1,0 +1,231 @@
+﻿/* =========================
+   THEME (Pizza vibe)
+========================= */
+:root {
+    --pc-green: #0b7b53;
+    --pc-green-700: #086645;
+    --pc-cream: #fff7e6;
+    --soft: #f6f7f9;
+}
+
+/* =========================
+   LAYOUT CHUNG
+========================= */
+.cart-page {
+    max-width: 1200px;
+}
+
+    .cart-page .card {
+        border-radius: 1rem;
+    }
+
+/* Giữ tóm tắt cố định bên phải ở màn lớn */
+.summary-card {
+    position: sticky;
+    top: 84px;
+}
+
+/* =========================
+   BẢNG GIỎ HÀNG (TABLE)
+========================= */
+.cart-table {
+    --row-pad: 14px;
+}
+
+    .cart-table thead th {
+        font-weight: 600;
+        letter-spacing: .2px;
+    }
+
+    .cart-table tbody td {
+        padding-block: var(--row-pad);
+        vertical-align: middle;
+        border-color: #eef0f3;
+    }
+
+/* Định cột để không bể layout */
+.col-img {
+    width: 96px;
+    white-space: nowrap;
+}
+
+.col-title {
+    min-width: 240px;
+    white-space: nowrap;
+}
+
+.col-price {
+    width: 150px;
+    white-space: nowrap;
+}
+
+.col-qty {
+    width: 170px;
+    white-space: nowrap;
+}
+
+.col-sub {
+    width: 160px;
+    white-space: nowrap;
+}
+
+.col-actions {
+    width: 84px;
+    white-space: nowrap;
+}
+
+/* =========================
+   ITEM CONTENT
+========================= */
+/* Ảnh thu nhỏ gọn */
+.cart-thumb-compact {
+    width: 88px;
+    height: 88px;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06);
+}
+
+/* Tên & mô tả (clamp 2 dòng) */
+.cart-name {
+    font-weight: 600;
+    line-height: 1.25;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 420px;
+}
+
+.cart-meta {
+    color: #6b7280;
+    font-size: .85rem;
+}
+
+/* (Optional) thumbnail kiểu cũ nếu có dùng ở nơi khác */
+.cart-thumb {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: .75rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06);
+}
+
+/* =========================
+   QTY CONTROL
+========================= */
+.qty-group .btn {
+    min-width: 38px;
+    border-color: #d9dee5;
+}
+
+.qty-group .form-control {
+    max-width: 64px;
+    border-color: #d9dee5;
+}
+
+/* =========================
+   SUMMARY CARD (TỔNG TIỀN)
+========================= */
+.summary-card .card-body {
+    padding: 1.25rem;
+}
+
+.summary-card .total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: .4rem;
+}
+
+    .summary-card .total-row .label {
+        color: #6b7280;
+    }
+
+.summary-card .grand {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.15rem;
+    margin: .6rem 0 1rem;
+}
+
+    .summary-card .grand strong {
+        color: #d32b29;
+    }
+
+/* =========================
+   COUPON BOX
+========================= */
+.coupon .badge {
+    font-weight: 600;
+}
+
+.coupon .btn {
+    white-space: nowrap;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.btn-cta {
+    background: var(--pc-green);
+    border: none;
+    border-radius: 999px;
+    padding: .8rem 1rem;
+    font-weight: 700;
+}
+
+    .btn-cta:hover {
+        background: var(--pc-green-700);
+    }
+
+/* =========================
+   EMPTY STATE
+========================= */
+.cart-empty {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #6b7280;
+}
+
+    .cart-empty .icon {
+        font-size: 2.25rem;
+    }
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 992px) {
+    .summary-card {
+        position: static;
+    }
+
+    .cart-name {
+        max-width: 280px;
+    }
+}
+
+@media (max-width: 576px) {
+    .col-img {
+        width: 72px;
+    }
+
+    .cart-thumb-compact {
+        width: 64px;
+        height: 64px;
+    }
+
+    .col-price {
+        width: 120px;
+    }
+
+    .col-sub {
+        width: 130px;
+    }
+
+    .qty-group .form-control {
+        max-width: 54px;
+    }
+}

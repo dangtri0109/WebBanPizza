@@ -1,0 +1,196 @@
+﻿@model WebBanPizza.Models.Pizza
+@{
+    ViewData["Title"] = Model.Ten;
+    ViewData["BodyClass"] = "pizza-detail-page";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/pizza-details.css" />
+}
+
+<div class="detail-wrapper">
+    <div class="pizza-detail container">
+        <div class="row g-4 align-items-start">
+            <!-- Ảnh -->
+            <div class="col-lg-6">
+                <img class="pizza-img"
+                     src="@(string.IsNullOrEmpty(Model.HinhAnh)
+                                ? Url.Content("~/images/pizza-default.jpg")
+                                : Url.Content("~/images/" + Model.HinhAnh))"
+                     alt="@Model.Ten" />
+            </div>
+
+            <!-- Nội dung -->
+            <div class="col-lg-6">
+                <h1 class="pizza-title h3 mb-2">@Model.Ten</h1>
+                <p class="pizza-meta mb-3">
+                    @(string.IsNullOrWhiteSpace(Model.MoTa)
+                        ? "Đế mỏng, phô mai kéo sợi, nguyên liệu tươi mỗi ngày."
+                        : Model.MoTa)
+                </p>
+
+                <!-- Giá và Rating -->
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="price">@String.Format("{0:N0} đ", Model.Gia)</div>
+
+                    <div class="rating-wrap">
+                        @if ((int)(ViewBag.TotalRating ?? 0) > 0)
+                        {
+                            double avg = (double)(ViewBag.AvgRating ?? 0.0);
+                            int rounded = (int)Math.Round(avg);
+
+                            <span class="stars">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= rounded)
+                                    {
+                                        <span class="on">★</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="off">★</span>
+                                    }
+                                }
+                            </span>
+                            <span class="rating-text">@ViewBag.AvgRating/5</span>
+                            <span class="text-muted">(@ViewBag.TotalRating đánh giá)</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Chưa có đánh giá</span>
+                        }
+                    </div>
+                </div>
+
+                <!-- Thêm vào giỏ -->
+                <form asp-controller="GioHang"
+                      asp-action="ThemVaoGio"
+                      asp-route-id="@Model.PizzaId"
+                      method="post" class="mt-2">
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="qty">
+                            <button type="button" onclick="stepQty(-1)">−</button>
+                            <input id="qty" name="soLuong" type="number" value="1" min="1" />
+                            <button type="button" onclick="stepQty(1)">+</button>
+                        </div>
+
+                        <button class="btn btn-cta">🛒 Thêm vào giỏ hàng</button>
+
+                        <!-- Nút xem thêm món -->
+                        <button type="button" id="btnBackToList" class="btn btn-outline">
+                            ← Xem thêm món
+                        </button>
+                    </div>
+                </form>
+
+                <hr class="hr-soft my-4" />
+
+                <ul class="benefits list-unstyled small mb-0">
+                    <li>🚚 Giao nhanh trong 30’ • Miễn phí đơn từ 199k (nội thành)</li>
+                    <li>🧾 Hóa đơn điện tử • Thanh toán QR/Momo/VNPAY</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ==== ĐÁNH GIÁ ==== -->
+        <hr class="hr-soft my-5" />
+
+        <div class="row g-4">
+            <!-- Form đánh giá -->
+            <div class="col-lg-5">
+                <h5 class="mb-2">Đánh giá món ăn</h5>
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-warning">@TempData["Error"]</div>
+                }
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success">@TempData["Success"]</div>
+                }
+
+                <form asp-action="AddReview" method="post" class="review-form">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="pizzaId" value="@Model.PizzaId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Chọn số sao</label>
+                        <select name="soSao" class="form-select" required>
+                            <option value="5">★★★★★ (Rất ngon)</option>
+                            <option value="4">★★★★☆</option>
+                            <option value="3">★★★☆☆</option>
+                            <option value="2">★★☆☆☆</option>
+                            <option value="1">★☆☆☆☆ (Chưa ngon)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Bình luận (tuỳ chọn)</label>
+                        <textarea name="binhLuan" rows="3" class="form-control"
+                                  placeholder="Hương vị, size, giao nhanh/chậm..."></textarea>
+                    </div>
+
+                    <button class="btn btn-cta w-100" type="submit">Gửi đánh giá</button>
+                </form>
+            </div>
+
+            <!-- Danh sách đánh giá -->
+            <div class="col-lg-7">
+                <h5 class="mb-2">Khách hàng nói gì?</h5>
+
+                @if (Model.DanhGia != null && Model.DanhGia.Any())
+                {
+                    foreach (var dg in Model.DanhGia.OrderByDescending(x => x.NgayDanhGia))
+                    {
+                        <div class="review-card mb-3">
+                            <div class="d-flex justify-content-between">
+                                <div class="who">@(dg.User?.HoTen ?? "Ẩn danh")</div>
+                                <div class="when">@dg.NgayDanhGia?.ToString("dd/MM/yyyy HH:mm")</div>
+                            </div>
+                            <div class="mb-1">
+                                @{
+                                    int stars = dg.SoSao ?? 0;
+                                }
+                                @for (int i = 0; i < stars; i++) { <span class="on">★</span> }
+                                @for (int i = stars; i < 5; i++) { <span class="off">★</span> }
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(dg.BinhLuan))
+                            {
+                                <div>@dg.BinhLuan</div>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-muted">Chưa có đánh giá nào cho món này.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function stepQty(step){
+            const el = document.getElementById('qty');
+            const v = Math.max(1, parseInt(el.value || 1) + step);
+            el.value = v;
+        }
+
+        // Quay về trang lọc (giữ bộ lọc cũ nếu người dùng tới từ /Pizza/Loc)
+        document.getElementById('btnBackToList').addEventListener('click', function () {
+            try {
+                const ref = document.referrer || '';
+                if (ref) {
+                    const u = new URL(ref);
+                    if (u.pathname.toLowerCase().includes('/pizza/loc')) {
+                        window.location.href = ref;
+                        return;
+                    }
+                }
+            } catch (e) {}
+            window.location.href = '@Url.Action("Loc", "Pizza")';
+        });
+    </script>
+}

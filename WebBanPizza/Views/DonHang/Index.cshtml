@@ -1,0 +1,116 @@
+﻿@using Microsoft.AspNetCore.Http
+@model IEnumerable<WebBanPizza.Models.DonHang>
+
+@{
+    ViewData["Title"] = "Đơn hàng của bạn";
+    bool isAdmin = (Context.Session.GetString("VaiTro") ?? "") == "Admin";
+
+    string GetBadge(string? status)
+    {
+        status = (status ?? "").Trim();
+        if (status.Equals("Hoàn tất", StringComparison.OrdinalIgnoreCase)) return "done";
+        if (status.Contains("Hủy", StringComparison.OrdinalIgnoreCase) || status.Contains("Huỷ", StringComparison.OrdinalIgnoreCase)) return "cancel";
+        if (status.Contains("Đang giao", StringComparison.OrdinalIgnoreCase)) return "shipping";
+        return "processing";
+    }
+}
+
+<section class="orders-page container-xl py-4">
+    <!-- Tiêu đề + nút -->
+    <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+        <div class="orders-icon rounded-3 d-flex align-items-center justify-content-center">
+            <span>🧾</span>
+        </div>
+        <h1 class="h3 mb-0">Đơn hàng của bạn</h1>
+
+        <div class="ms-auto">
+            <a asp-controller="Pizza" asp-action="Index" class="btn btn-outline-secondary">Tiếp tục mua</a>
+        </div>
+    </div>
+
+    <!-- Bảng đơn hàng -->
+    <div class="card shadow-sm rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table orders-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width:120px">Mã đơn</th>
+                            <th style="width:210px">Ngày đặt</th>
+                            <th class="text-end">Tổng tiền</th>
+                            <th style="width:170px">Trạng thái</th>
+                            <th class="text-end" style="width:360px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var d in Model)
+                        {
+                            var status = d.TrangThai ?? "Chờ xử lý";
+                            var badge = GetBadge(status);
+                            <tr class="@(status == "Chờ xử lý" ? "table-light" : "")">
+                                <td><span class="order-code">#@d.DonHangId</span></td>
+                                <td>@(d.NgayDat?.ToString("dd/MM/yyyy HH:mm"))</td>
+                                <td class="text-end"><strong>@String.Format("{0:N0} đ", d.TongTien ?? 0)</strong></td>
+                                <td><span class="status-badge @badge">@status</span></td>
+
+                                <!-- Gộp chi tiết + admin action -->
+                                <td class="text-end">
+                                    <a asp-action="ChiTiet" asp-route-id="@d.DonHangId" class="btn btn-sm btn-detail">Chi tiết</a>
+
+                                    @if (isAdmin)
+                                    {
+                                        if (status == "Chờ xử lý")
+                                        {
+                                            <form asp-controller="QuanLy" asp-action="CapNhatTrangThai" method="post" class="d-inline ms-1">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@d.DonHangId" />
+                                                <input type="hidden" name="trangThai" value="Đang giao" />
+                                                <input type="hidden" name="daThanhToan" value="false" />
+                                                <button class="btn btn-sm btn-warning">Giao hàng</button>
+                                            </form>
+
+                                            <form asp-controller="QuanLy" asp-action="CapNhatTrangThai" method="post" class="d-inline ms-1"
+                                                  onsubmit="return confirm('Đánh dấu đơn #@d.DonHangId là Hoàn tất?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@d.DonHangId" />
+                                                <input type="hidden" name="trangThai" value="Hoàn tất" />
+                                                <input type="hidden" name="daThanhToan" value="true" />
+                                                <button class="btn btn-sm btn-success">Hoàn tất</button>
+                                            </form>
+                                        }
+                                        else if (status == "Đang giao")
+                                        {
+                                            <form asp-controller="QuanLy" asp-action="GiaoHangThanhCong" method="post" class="d-inline ms-1"
+                                                  onsubmit="return confirm('Xác nhận đã giao xong đơn #@d.DonHangId?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@d.DonHangId" />
+                                                <button class="btn btn-sm btn-success">Hoàn tất</button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            @: <!-- để trống, không hiển thị gì -->
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chú thích trạng thái -->
+    <div class="orders-foot mt-3 d-flex gap-3 flex-wrap">
+        <div class="legend d-flex align-items-center gap-2">
+            <span class="status-badge done">Hoàn tất</span>
+            <span class="status-badge processing">Đang xử lý</span>
+            <span class="status-badge shipping">Đang giao</span>
+            <span class="status-badge cancel">Đã hủy</span>
+        </div>
+        <div class="ms-auto text-muted small">
+            Tip: Bấm “Chi tiết” để xem địa chỉ giao hàng, phí ship, phương thức, lịch sử trạng thái.
+        </div>
+    </div>
+</section>

@@ -1,0 +1,76 @@
+﻿/* ===== LOGIN – clean premium ===== */
+
+/* Nền sáng với blob màu nhẹ */
+body {
+    --bg1: #fff7e6; /* kem */
+    --blob1: rgba(200,16,46,.18); /* đỏ brand mờ */
+    --blob2: rgba(0,99,65,.10); /* xanh mờ */
+    background: radial-gradient(900px 450px at 15% 10%, var(--blob1), transparent 60%), radial-gradient(700px 380px at 90% 20%, var(--blob2), transparent 60%), var(--bg1);
+    min-height: 100vh;
+}
+
+/* Căn giữa nội dung trang (chỉ ở login vì CSS này chỉ load tại view) */
+.container-xl > main {
+    min-height: calc(100vh - 180px); /* chừa header + footer */
+    display: grid;
+    place-items: start center;
+    padding-top: 32px;
+}
+
+/* Tiêu đề */
+h2 {
+    font-weight: 800;
+    letter-spacing: .3px;
+    color: #1f2937;
+    margin: 0 0 14px 0;
+    text-align: center;
+}
+
+/* Thẻ form thành thẻ card đẹp */
+form[action*="DangNhap"] {
+    width: min(560px, 92vw);
+    margin: 10px auto 56px;
+    padding: 28px 28px 22px;
+    background: rgba(255,255,255,.96);
+    border: 1px solid #f1f1f1;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.06), inset 0 4px 0 rgba(200,16,46,.08); /* viền top nhẹ màu đỏ */
+    backdrop-filter: saturate(120%) blur(6px);
+}
+
+/* Inputs */
+.form-group {
+    margin-bottom: 14px;
+}
+
+    .form-group label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+
+.form-control {
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+}
+
+    .form-control:focus {
+        border-color: #c8102e;
+        box-shadow: 0 0 0 .2rem rgba(200,16,46,.15);
+    }
+
+/* Button chính */
+.btn-primary {
+    background: #c8102e;
+    border-color: #c8102e;
+    border-radius: 12px;
+    font-weight: 700;
+    padding: 10px 16px;
+}
+
+    .btn-primary:hover {
+        background: #a40d24;
+        border-color: #a40d24;
+    }

@@ -1,0 +1,129 @@
+﻿/* ===== Add Pizza – styles riêng ===== */
+:root {
+    --pc-green: #006341;
+    --pc-green-700: #004f33;
+    --soft: #f6f7f9;
+}
+
+/* page background */
+.admin-page {
+    background: linear-gradient(180deg, #fafcfd, #f2f6f9);
+}
+
+/* title */
+.page-title .title-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--pc-green);
+}
+
+.fw-600 {
+    font-weight: 600;
+}
+
+/* card */
+.card-soft {
+    border: 1px solid #eef0f3;
+    background: #fff;
+    border-radius: 1rem;
+}
+
+    .card-soft .card-body {
+        padding: 1.25rem;
+    }
+
+@media (min-width: 992px) {
+    .card-soft .card-body {
+        padding: 1.5rem;
+    }
+}
+
+/* inputs */
+.form-control, .form-select {
+    border-radius: .7rem;
+    border-color: #dfe3ea;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: #b8c4d6;
+        box-shadow: 0 0 0 .2rem rgba(0, 99, 65, .08);
+    }
+
+/* cta button */
+.btn-cta {
+    background: var(--pc-green);
+    border: none;
+    color: #fff;
+    border-radius: .9rem;
+    padding: .7rem 1rem;
+    font-weight: 600;
+}
+
+    .btn-cta:hover {
+        background: var(--pc-green-700);
+    }
+
+/* upload dropzone */
+.upload-dropzone {
+    border: 2px dashed #d9dee6;
+    border-radius: 1rem;
+    display: block;
+    text-align: center;
+    padding: 18px;
+    background: #fff;
+    transition: .2s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+    .upload-dropzone .dz-in {
+        pointer-events: none;
+    }
+
+    .upload-dropzone .dz-icon {
+        font-size: 32px;
+        line-height: 1;
+        margin-bottom: 6px;
+    }
+
+    .upload-dropzone .link {
+        text-decoration: underline;
+    }
+
+    .upload-dropzone.dragging {
+        background: #f8fbff;
+        border-color: #b7cdf5;
+    }
+
+    .upload-dropzone.has-image {
+        padding: 0;
+        border-style: solid;
+    }
+
+/* image preview */
+.img-preview {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: block;
+    border-radius: .9rem;
+}
+
+/* helper */
+.text-danger.small {
+    font-size: .85rem;
+}
+
+.form-text {
+    color: #8a93a3;
+}
+
+/* spacing tweak on small screens */
+@media (max-width: 575.98px) {
+    .admin-page {
+        padding-left: .75rem;
+        padding-right: .75rem;
+    }
+}

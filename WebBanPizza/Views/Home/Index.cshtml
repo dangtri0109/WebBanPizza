@@ -1,0 +1,99 @@
+﻿@model WebBanPizza.Models.HomeIndexVM
+@{
+    ViewData["Title"] = "Đặt Pizza Online";
+}
+
+<!-- HERO -->
+<section class="hero-pc my-4">
+    <div class="container-xl">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="display-6 fw-bold mb-2">Pizza nóng hổi – Giao nhanh 30’</h1>
+                <p class="sub mb-3">Combo tiết kiệm • Thanh toán QR • Nhiều mã giảm giá</p>
+                <a class="btn btn-cta btn-lg me-2" asp-controller="Pizza" asp-action="Index">Đặt ngay</a>
+                <a class="btn btn-light btn-lg" asp-controller="Pizza" asp-action="Loc">Xem khuyến mãi</a>
+            </div>
+
+            <!-- Video bên phải -->
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="hero-video rounded-4 shadow-sm">
+                    <video autoplay muted loop playsinline preload="metadata"
+                           poster="@Url.Content("~/images/hero-pizza-poster.jpg")"
+                           disablepictureinpicture>
+                        <source src='@Url.Content("~/videos/hero-pizza.webm")' type="video/webm" />
+                        <source src='@Url.Content("~/videos/hero-pizza.mp4")' type="video/mp4" />
+                        Trình duyệt của bạn không hỗ trợ video.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4 SẢN PHẨM SẮP RA MẮT -->
+<section class="my-4">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <h2 class="h4 fw-bold m-0">Sản phẩm sắp ra mắt</h2>
+        <!-- CHỈNH TẠI ĐÂY: chuyển Index -> Loc -->
+        <a class="btn btn-sm btn-outline-primary" asp-controller="Pizza" asp-action="Loc">Xem menu</a>
+    </div>
+
+    <div class="row g-3">
+        @foreach (var p in Model.ComingSoon)
+        {
+            <div class="col-6 col-lg-3">
+                <div class="pc-card-comingsoon position-relative h-100 text-center">
+                    <div class="pc-thumb">
+                        <img src="@Url.Content(p.ImageUrl)" alt="@p.Name"
+                             class="img-fluid w-100 object-fit-cover rounded-4" />
+                        <span class="pc-badge">COMING SOON</span>
+                    </div>
+                    <div class="pc-body mt-2">
+                        <h5 class="fw-bold mb-1">@p.Name</h5>
+                        <p class="text-muted small mb-1">@p.Teaser</p>
+                        @if (p.ReleaseDate.HasValue)
+                        {
+                            <small class="text-secondary">Ra mắt: @p.ReleaseDate.Value.ToString("dd/MM/yyyy")</small>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- SẢN PHẨM NỔI BẬT -->
+<section class="my-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="h4 fw-bold m-0">Pizza nổi bật</h2>
+        <a class="text-decoration-none" asp-controller="Pizza" asp-action="Loc">Xem tất cả →</a>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var p in Model.FeaturedPizzas.Take(8))
+        {
+            <div class="col-12 col-sm-6 col-lg-3">
+                @Html.Partial("_PizzaCardCompany", p)
+            </div>
+        }
+    </div>
+</section>
+
+@* Footer chỉ hiện ở trang chủ *@
+@await Html.PartialAsync("_FooterContact")
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.card-pizza').forEach(card => {
+            const pills = card.querySelectorAll('.size-pill');
+            const input = card.querySelector('.js-size');
+            pills.forEach(p => {
+                p.addEventListener('click', () => {
+                    pills.forEach(x => x.classList.remove('active'));
+                    p.classList.add('active'); // sửa lỗi dấu ngoặc ở đây
+                    if (input) input.value = p.dataset.size;
+                });
+            });
+        });
+    </script>
+}

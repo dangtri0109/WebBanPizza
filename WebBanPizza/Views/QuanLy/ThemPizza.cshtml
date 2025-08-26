@@ -1,0 +1,139 @@
+﻿@model WebBanPizza.Models.PizzaUploadViewModel
+@{
+    ViewData["Title"] = "Thêm Pizza";
+}
+
+<div class="container-xl admin-page py-4">
+    <div class="page-title d-flex align-items-center gap-3 mb-3">
+        <div class="title-dot"></div>
+        <h2 class="m-0">Thêm Pizza</h2>
+    </div>
+
+    <form asp-action="ThemPizza" method="post" enctype="multipart/form-data" class="row g-4">
+        @Html.AntiForgeryToken()
+
+        <!-- LEFT -->
+        <div class="col-lg-8">
+            <div class="card card-soft shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label fw-600">Tên</label>
+                            <input asp-for="Ten" class="form-control form-control-lg" placeholder="VD: Hải sản phô mai" />
+                            <span asp-validation-for="Ten" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-600">Giá</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₫</span>
+                                <input asp-for="Gia" class="form-control" inputmode="decimal" id="giaField" placeholder="0" />
+                            </div>
+                            <span asp-validation-for="Gia" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-600">Danh mục</label>
+                            <select asp-for="DanhMucId" asp-items="ViewBag.DanhMucs" class="form-select"></select>
+                            <span asp-validation-for="DanhMucId" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label fw-600">Mô tả</label>
+                        <textarea asp-for="MoTa" class="form-control" rows="4" maxlength="500" id="motaField"
+                                  placeholder="Mô tả topping, kích cỡ, độ phô mai..."></textarea>
+                        <div class="form-text text-end"><span id="motaCount">0</span>/500</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="col-lg-4">
+            <div class="card card-soft shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <label class="form-label fw-600">Hình ảnh</label>
+
+                    <!-- Dropzone -->
+                    <label class="upload-dropzone w-100" for="fileInput">
+                        <input asp-for="HinhAnhUpload" id="fileInput" type="file" class="d-none"
+                               accept=".jpg,.jpeg,.png,.gif,.webp" />
+                        <div class="dz-in">
+                            <div class="dz-icon">📷</div>
+                            <div>Thả ảnh vào đây hoặc <span class="link">chọn ảnh</span></div>
+                            <div class="small text-muted mt-1">JPG/PNG/WebP • &lt; 3MB khuyến nghị</div>
+                        </div>
+                        <img id="preview" class="img-preview d-none" alt="preview" />
+                    </label>
+                    <span asp-validation-for="HinhAnhUpload" class="text-danger small"></span>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-cta">💾 Lưu Pizza</button>
+                        <a asp-action="Pizza" class="btn btn-outline-secondary">Hủy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // --- Format tiền nhẹ nhàng ---
+        const gia = document.getElementById('giaField');
+        if (gia) {
+            gia.addEventListener('input', () => {
+                const pos = gia.selectionStart;
+                let v = gia.value.replace(/[^\d.]/g, '');
+                // chỉ 1 dấu chấm
+                const parts = v.split('.');
+                if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
+                gia.value = v;
+                // giữ caret tương đối
+                gia.setSelectionRange(pos, pos);
+            });
+        }
+
+        // --- Đếm ký tự mô tả ---
+        const mota = document.getElementById('motaField');
+        const motaCount = document.getElementById('motaCount');
+        if (mota && motaCount) {
+            const upd = () => motaCount.textContent = mota.value.length;
+            mota.addEventListener('input', upd); upd();
+        }
+
+        // --- Preview + drag&drop ---
+        const input = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        const dz = document.querySelector('.upload-dropzone');
+
+        function showPreview(file) {
+            if (!file) return;
+            const ok = /image\/(png|jpeg|jpg|gif|webp)/.test(file.type);
+            if (!ok) { alert('Vui lòng chọn file ảnh hợp lệ.'); input.value = ''; return; }
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+                dz.classList.add('has-image');
+            };
+            reader.readAsDataURL(file);
+        }
+        input?.addEventListener('change', e => showPreview(e.target.files[0]));
+
+        ;['dragover', 'dragenter'].forEach(evt =>
+            dz?.addEventListener(evt, e => { e.preventDefault(); dz.classList.add('dragging'); })
+        );
+        ;['dragleave', 'drop'].forEach(evt =>
+            dz?.addEventListener(evt, e => { e.preventDefault(); dz.classList.remove('dragging'); })
+        );
+        dz?.addEventListener('drop', e => {
+            const file = e.dataTransfer.files[0];
+            if (file) { input.files = e.dataTransfer.files; showPreview(file); }
+        });
+    </script>
+}

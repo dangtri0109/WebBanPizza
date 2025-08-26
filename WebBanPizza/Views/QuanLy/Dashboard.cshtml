@@ -1,0 +1,128 @@
+﻿@{
+    ViewData["Title"] = "📊 Dashboard doanh thu";
+    var format = "{0:N0} đ";
+}
+
+<h2>📊 Thống kê đơn hàng</h2>
+
+<!-- FORM LỌC -->
+<form asp-action="Dashboard" method="get" class="row mb-4">
+    <div class="col-md-3">
+        <label>Tháng</label>
+        <select name="thang" class="form-control">
+            <option value="">-- Tất cả --</option>
+            @for (int i = 1; i <= 12; i++)
+            {
+                string selected = "";
+                if (Context.Request.Query["thang"] == i.ToString())
+                {
+                    selected = "selected";
+                }
+                <option value="@i" selected="@selected">Tháng @i</option>
+            }
+        </select>
+
+        <select name="nam" class="form-control">
+            <option value="">-- Tất cả --</option>
+            @for (int i = DateTime.Now.Year; i >= 2020; i--)
+            {
+                string selected = "";
+                if (Context.Request.Query["nam"] == i.ToString())
+                {
+                    selected = "selected";
+                }
+                <option value="@i" selected="@selected">@i</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2 align-self-end">
+        <button type="submit" class="btn btn-primary">Lọc</button>
+    </div>
+</form>
+
+
+<!-- THỐNG KÊ -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5>Tổng doanh thu</h5>
+                <h3>@String.Format(format, ViewBag.TongDoanhThu)</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5>Tổng đơn hàng</h5>
+                <h3>@ViewBag.SoDon</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h6>🕓 Chờ xử lý</h6>
+                <h4>@ViewBag.ChoXuLy</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card bg-secondary text-white">
+            <div class="card-body">
+                <h6>🚚 Đang giao</h6>
+                <h4>@ViewBag.DangGiao</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h6>✅ Hoàn tất</h6>
+                <h4>@ViewBag.HoanTat</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BIỂU ĐỒ -->
+<h4 class="mt-5">📈 Biểu đồ doanh thu theo ngày</h4>
+<canvas id="chartDoanhThu" height="100"></canvas>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const dataChart = @Html.Raw(ViewBag.DoanhThuChart ?? "[]");
+
+        const labels = dataChart.map(item => item.Ngay);
+        const data = dataChart.map(item => item.Tong);
+
+        const ctx = document.getElementById('chartDoanhThu').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Doanh thu (VNĐ)',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString() + ' đ';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

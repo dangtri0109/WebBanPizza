@@ -1,0 +1,33 @@
+﻿@model List<WebBanPizza.Models.ComingSoonPizzaVM>
+
+<section class="container my-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="mb-0">Sản phẩm sắp ra mắt</h2>
+        <a class="btn btn-sm btn-outline-primary" asp-controller="Pizza" asp-action="Index">Xem menu</a>
+    </div>
+
+    <div class="row g-3">
+        @foreach (var p in Model)
+        {
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="pc-card-comingsoon position-relative h-100">
+                    <div class="pc-thumb ratio ratio-1x1">
+                        <img src="@Url.Content(p.ImageUrl)" alt="@p.Name"
+                             class="img-fluid w-100 h-100 object-fit-cover rounded-4" />
+                        <span class="pc-badge">COMING SOON</span>
+                    </div>
+                    <div class="pc-body mt-2">
+                        <h5 class="fw-bold mb-1">@p.Name</h5>
+                        <p class="text-muted mb-2">@p.Teaser</p>
+                        @if (p.ReleaseDate.HasValue)
+                        {
+                            <small class="text-secondary">
+                                Ra mắt: @p.ReleaseDate.Value.ToString("dd/MM/yyyy")
+                            </small>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>

@@ -1,0 +1,29 @@
+﻿@model IEnumerable<WebBanPizza.Models.Pizza>
+
+@{
+    ViewData["Title"] = "Danh sách Pizza";
+}
+
+<h2 class="text-center my-4">Pizza Menu</h2>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        var needsZoom = (item.HinhAnh?.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ?? false);
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm rounded-4 overflow-hidden">
+                <div class="pizza-thumb">
+                    <img src="~/images/@item.HinhAnh"
+                         alt="@item.Ten"
+                         class="@(needsZoom ? "fit-zoom" : "")" />
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">@item.Ten</h5>
+                    <p class="card-text">@item.MoTa</p>
+                    <p class="card-text text-danger fw-bold">@String.Format("{0:N0} đ", item.Gia)</p>
+                    <a asp-action="Details" asp-route-id="@item.PizzaId" class="btn btn-primary">Mua ngay</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

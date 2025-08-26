@@ -1,0 +1,44 @@
+﻿@model List<WebBanPizza.Models.Pizza>
+<link rel="stylesheet" href="~/css/admin-pizza.css" asp-append-version="true" />
+
+<div class="container-narrow">
+    <div class="pz-header">
+        <div style="font-size:24px">🍕</div>
+        <div class="pz-title">Quản lý Pizza</div>
+    </div>
+
+    <a class="pz-add mb-3" asp-action="ThemPizza">➕ Thêm Pizza</a>
+
+    <div class="pz-card">
+        <div class="pz-wrap">
+            <table class="pz">
+                <thead>
+                    <tr>
+                        <th class="col-id">ID</th>
+                        <th class="col-img">Hình ảnh</th>
+                        <th>Tên</th>
+                        <th class="col-cat">Danh mục</th>
+                        <th class="col-price">Giá</th>
+                        <th class="col-act">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td class="col-id">@p.PizzaId</td>
+                            <td class="col-img"><img class="pz-thumb" src="~/images/@p.HinhAnh" alt="@p.Ten" /></td>
+                            <td><div class="pz-name">@p.Ten</div></td>
+                            <td><span class="badge-cat">@p.DanhMuc?.TenDanhMuc</span></td>
+                            <td class="col-price">@String.Format("{0:N0} đ", p.Gia)</td>
+                            <td class="col-act">
+                                <a asp-action="SuaPizza" asp-route-id="@p.PizzaId" class="btn-act btn-edit">Sửa</a>
+                                <a asp-action="XoaPizza" asp-route-id="@p.PizzaId" class="btn-act btn-del" onclick="return confirm('Xóa pizza này?')">Xóa</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
