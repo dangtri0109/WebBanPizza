@@ -29,15 +29,29 @@
                             <label class="form-label fw-600">Giá</label>
                             <div class="input-group">
                                 <span class="input-group-text">₫</span>
-                                <input asp-for="Gia" class="form-control" inputmode="decimal" id="giaField" placeholder="0" />
+                                <input asp-for="Gia" class="form-control" id="giaField" placeholder="0"
+                                       inputmode="decimal" autocomplete="off" min="0" step="1000" />
                             </div>
                             <span asp-validation-for="Gia" class="text-danger small"></span>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-600">Danh mục</label>
-                            <select asp-for="DanhMucId" asp-items="ViewBag.DanhMucs" class="form-select"></select>
+                            <select asp-for="DanhMucId" asp-items="ViewBag.DanhMucs" class="form-select">
+                                <option value="">-- chọn danh mục --</option>
+                            </select>
                             <span asp-validation-for="DanhMucId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Kích thước S/M/L -->
+                        <div class="col-md-3">
+                            <label class="form-label fw-600">Kích thước</label>
+                            <select asp-for="KichThuoc" class="form-select">
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                            </select>
+                            <span asp-validation-for="KichThuoc" class="text-danger small"></span>
                         </div>
                     </div>
 
@@ -64,7 +78,7 @@
                         <div class="dz-in">
                             <div class="dz-icon">📷</div>
                             <div>Thả ảnh vào đây hoặc <span class="link">chọn ảnh</span></div>
-                            <div class="small text-muted mt-1">JPG/PNG/WebP • &lt; 3MB khuyến nghị</div>
+                            <div class="small text-muted mt-1">JPG/PNG/WebP • ≤ 2MB</div>
                         </div>
                         <img id="preview" class="img-preview d-none" alt="preview" />
                     </label>
@@ -89,12 +103,10 @@
             gia.addEventListener('input', () => {
                 const pos = gia.selectionStart;
                 let v = gia.value.replace(/[^\d.]/g, '');
-                // chỉ 1 dấu chấm
                 const parts = v.split('.');
                 if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
                 gia.value = v;
-                // giữ caret tương đối
-                gia.setSelectionRange(pos, pos);
+                try { gia.setSelectionRange(pos, pos); } catch {}
             });
         }
 
@@ -123,15 +135,15 @@
             };
             reader.readAsDataURL(file);
         }
-        input?.addEventListener('change', e => showPreview(e.target.files[0]));
+        input && input.addEventListener('change', e => showPreview(e.target.files[0]));
 
-        ;['dragover', 'dragenter'].forEach(evt =>
-            dz?.addEventListener(evt, e => { e.preventDefault(); dz.classList.add('dragging'); })
+        ['dragover', 'dragenter'].forEach(evt =>
+            dz && dz.addEventListener(evt, e => { e.preventDefault(); dz.classList.add('dragging'); })
         );
-        ;['dragleave', 'drop'].forEach(evt =>
-            dz?.addEventListener(evt, e => { e.preventDefault(); dz.classList.remove('dragging'); })
-        );
-        dz?.addEventListener('drop', e => {
+        ['dragleave', 'drop'].forEach evt =>
+            dz && dz.addEventListener(evt, e => { e.preventDefault(); dz.classList.remove('dragging'); })
+        ;
+        dz && dz.addEventListener('drop', e => {
             const file = e.dataTransfer.files[0];
             if (file) { input.files = e.dataTransfer.files; showPreview(file); }
         });

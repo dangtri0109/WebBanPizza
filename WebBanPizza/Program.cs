@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Linq;                          // <— cần cho Any()
+using System.Linq;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using WebBanPizza.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Cấu hình Session
+// Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -15,7 +16,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// ✅ DbContext dùng PostgreSQL (Render lấy từ biến môi trường ConnectionStrings__DefaultConnection)
+// DbContext PostgreSQL
 builder.Services.AddDbContext<PizzaDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -23,34 +24,47 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// ===== Auto-migrate & seed Admin (chạy khi app start) =====
+// ===== Auto-migrate & seed on startup =====
 using (var scope = app.Services.CreateScope())
 {
     try
     {
         var db = scope.ServiceProvider.GetRequiredService<PizzaDbContext>();
 
-        // Tự apply migrations vào DB Postgres (nếu DB trống sẽ tạo bảng)
+        // Apply migrations
         db.Database.Migrate();
 
-        // Tạo Admin mặc định nếu chưa có
+        // Seed Admin mặc định
         var adminEmail = "admin@pizza.local";
-        var adminPass = "123"; // 🔐 đăng nhập xong nhớ đổi ngay
+        var adminPass = "123"; // nhớ đổi sau khi đăng nhập
         if (!db.NguoiDungs.Any(u => u.Email == adminEmail))
         {
-            db.NguoiDungs.Add(new NguoiDung
+            var admin = new NguoiDung
             {
                 HoTen = "Admin",
                 Email = adminEmail,
-                MatKhau = adminPass, // ⚠️ nếu bạn có cơ chế hash, báo mình để đổi sang hash
+                MatKhau = adminPass,
                 VaiTro = "Admin"
-            });
+            };
+            db.NguoiDungs.Add(admin);
             db.SaveChanges();
         }
+
+        // Seed DanhMuc mặc định nếu trống
+        if (!db.DanhMucs.Any())
+            if (!db.DanhMucs.Any())
+            {
+                db.DanhMucs.AddRange(
+                    new DanhMuc { TenDanhMuc = "Hải sản" },
+                    new DanhMuc { TenDanhMuc = "Bò" },
+                    new DanhMuc { TenDanhMuc = "Gà" },
+                    new DanhMuc { TenDanhMuc = "Rau củ" }
+                );
+                db.SaveChanges();
+            }
     }
     catch (Exception ex)
     {
-        // Log thô ra console để xem trên Render Logs (tránh crash app)
         Console.WriteLine("Auto-migrate/seed error: " + ex);
     }
 }

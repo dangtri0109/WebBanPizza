@@ -44,7 +44,7 @@ namespace WebBanPizza.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CapNhatTrangThai(int id, string trangThai, bool daThanhToan, string? returnUrl)
+        public async Task<IActionResult> CapNhatTrangThai(int id, string trangThai, bool daThanhToan, string returnUrl)
         {
             if (!IsAdmin()) return Unauthorized();
 
@@ -66,32 +66,28 @@ namespace WebBanPizza.Controllers
             });
 
             await _context.SaveChangesAsync();
-            TempData["Success"] = $"✅ Đã cập nhật đơn #{donHang.DonHangId} ➜ {donHang.TrangThai}.";
-
-            // Ưu tiên returnUrl, nếu trống thì fallback sang Referer
-            if (string.IsNullOrWhiteSpace(returnUrl))
-            {
-                var referer = Request.Headers["Referer"].ToString();
-                if (!string.IsNullOrWhiteSpace(referer))
-                {
-                    try
-                    {
-                        var uri = new Uri(referer);
-                        returnUrl = uri.PathAndQuery;
-                    }
-                    catch { /* ignore */ }
-                }
-            }
+            TempData["Success"] = "✅ Đã cập nhật đơn #" + donHang.DonHangId + " ➜ " + donHang.TrangThai + ".";
 
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
 
-            return RedirectToAction(nameof(DonHang)); // fallback cuối
+            var referer = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrWhiteSpace(referer))
+            {
+                try
+                {
+                    var uri = new Uri(referer);
+                    var local = uri.PathAndQuery;
+                    if (Url.IsLocalUrl(local)) return Redirect(local);
+                }
+                catch { }
+            }
+            return RedirectToAction(nameof(DonHang));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GiaoHangThanhCong(int id, string? returnUrl)
+        public async Task<IActionResult> GiaoHangThanhCong(int id, string returnUrl)
         {
             if (!IsAdmin()) return Unauthorized();
 
@@ -104,24 +100,20 @@ namespace WebBanPizza.Controllers
                 TempData["Success"] = "Đơn hàng đã được giao thành công!";
             }
 
-            // Ưu tiên returnUrl, nếu trống thì fallback sang Referer
-            if (string.IsNullOrWhiteSpace(returnUrl))
-            {
-                var referer = Request.Headers["Referer"].ToString();
-                if (!string.IsNullOrWhiteSpace(referer))
-                {
-                    try
-                    {
-                        var uri = new Uri(referer);
-                        returnUrl = uri.PathAndQuery;
-                    }
-                    catch { /* ignore */ }
-                }
-            }
-
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
 
+            var referer = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrWhiteSpace(referer))
+            {
+                try
+                {
+                    var uri = new Uri(referer);
+                    var local = uri.PathAndQuery;
+                    if (Url.IsLocalUrl(local)) return Redirect(local);
+                }
+                catch { }
+            }
             return RedirectToAction(nameof(DonHang));
         }
 
@@ -130,7 +122,10 @@ namespace WebBanPizza.Controllers
         public async Task<IActionResult> Pizza()
         {
             if (!IsAdmin()) return Unauthorized();
-            var list = await _context.Pizzas.Include(p => p.DanhMuc).ToListAsync();
+            var list = await _context.Pizzas
+                .Include(p => p.DanhMuc)
+                .OrderByDescending(p => p.PizzaId)
+                .ToListAsync();
             return View(list);
         }
 
@@ -138,8 +133,11 @@ namespace WebBanPizza.Controllers
         public IActionResult ThemPizza()
         {
             if (!IsAdmin()) return Unauthorized();
-            ViewBag.DanhMucs = new SelectList(_context.DanhMucs, "DanhMucId", "TenDanhMuc");
-            return View(new PizzaUploadViewModel());
+            ViewBag.DanhMucs = new SelectList(
+                _context.DanhMucs.OrderBy(x => x.TenDanhMuc).ToList(),
+                "DanhMucId", "TenDanhMuc"
+            );
+            return View(new PizzaUploadViewModel { KichThuoc = "M" });
         }
 
         [HttpPost]
@@ -148,13 +146,25 @@ namespace WebBanPizza.Controllers
         {
             if (!IsAdmin()) return Unauthorized();
 
+            if (model.DanhMucId <= 0)
+                ModelState.AddModelError("DanhMucId", "Danh mục là bắt buộc.");
+
+            if (string.IsNullOrWhiteSpace(model.KichThuoc) ||
+                (model.KichThuoc != "S" && model.KichThuoc != "M" && model.KichThuoc != "L"))
+            {
+                ModelState.AddModelError("KichThuoc", "Kích thước phải là S, M hoặc L.");
+            }
+
             if (!ModelState.IsValid)
             {
-                ViewBag.DanhMucs = new SelectList(_context.DanhMucs, "DanhMucId", "TenDanhMuc");
+                ViewBag.DanhMucs = new SelectList(
+                    _context.DanhMucs.OrderBy(x => x.TenDanhMuc).ToList(),
+                    "DanhMucId", "TenDanhMuc"
+                );
                 return View(model);
             }
 
-            string fileName = await SaveImageAsync(model.HinhAnhUpload, model.HinhAnhCu);
+            var fileName = await SaveImageAsync(model.HinhAnhUpload, model.HinhAnhCu);
 
             var pizza = new Pizza
             {
@@ -162,7 +172,8 @@ namespace WebBanPizza.Controllers
                 MoTa = model.MoTa,
                 Gia = model.Gia,
                 DanhMucId = model.DanhMucId,
-                HinhAnh = fileName ?? "default.jpg"
+                KichThuoc = model.KichThuoc,
+                HinhAnh = string.IsNullOrEmpty(fileName) ? "default.jpg" : fileName
             };
 
             _context.Pizzas.Add(pizza);
@@ -183,13 +194,18 @@ namespace WebBanPizza.Controllers
             {
                 PizzaId = pizza.PizzaId,
                 Ten = pizza.Ten,
-                MoTa = pizza.MoTa,
+                MoTa = pizza.MoTa ?? string.Empty,
                 Gia = pizza.Gia,
                 DanhMucId = pizza.DanhMucId ?? 0,
-                HinhAnhCu = pizza.HinhAnh
+                KichThuoc = string.IsNullOrEmpty(pizza.KichThuoc) ? "M" : pizza.KichThuoc,
+                HinhAnhCu = pizza.HinhAnh ?? string.Empty
             };
 
-            ViewBag.DanhMucs = new SelectList(_context.DanhMucs, "DanhMucId", "TenDanhMuc", pizza.DanhMucId);
+            ViewBag.DanhMucs = new SelectList(
+                _context.DanhMucs.OrderBy(x => x.TenDanhMuc).ToList(),
+                "DanhMucId", "TenDanhMuc",
+                vm.DanhMucId
+            );
             return View(vm);
         }
 
@@ -202,18 +218,31 @@ namespace WebBanPizza.Controllers
             var pizza = await _context.Pizzas.FindAsync(model.PizzaId);
             if (pizza == null) return NotFound();
 
+            if (model.DanhMucId <= 0)
+                ModelState.AddModelError("DanhMucId", "Danh mục là bắt buộc.");
+            if (string.IsNullOrWhiteSpace(model.KichThuoc) ||
+                (model.KichThuoc != "S" && model.KichThuoc != "M" && model.KichThuoc != "L"))
+            {
+                ModelState.AddModelError("KichThuoc", "Kích thước phải là S, M hoặc L.");
+            }
+
             if (!ModelState.IsValid)
             {
-                ViewBag.DanhMucs = new SelectList(_context.DanhMucs, "DanhMucId", "TenDanhMuc", model.DanhMucId);
+                ViewBag.DanhMucs = new SelectList(
+                    _context.DanhMucs.OrderBy(x => x.TenDanhMuc).ToList(),
+                    "DanhMucId", "TenDanhMuc",
+                    model.DanhMucId
+                );
                 return View(model);
             }
 
-            string fileName = await SaveImageAsync(model.HinhAnhUpload, model.HinhAnhCu);
+            var fileName = await SaveImageAsync(model.HinhAnhUpload, model.HinhAnhCu);
 
             pizza.Ten = model.Ten;
             pizza.MoTa = model.MoTa;
             pizza.Gia = model.Gia;
             pizza.DanhMucId = model.DanhMucId;
+            pizza.KichThuoc = model.KichThuoc;
             if (!string.IsNullOrEmpty(fileName))
                 pizza.HinhAnh = fileName;
 
@@ -222,8 +251,8 @@ namespace WebBanPizza.Controllers
             return RedirectToAction(nameof(Pizza));
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        // GET để tránh 405 khi lỡ truy cập URL trực tiếp
+        [HttpGet]
         public async Task<IActionResult> XoaPizza(int id)
         {
             if (!IsAdmin()) return Unauthorized();
@@ -236,12 +265,11 @@ namespace WebBanPizza.Controllers
                     var path = Path.Combine(_env.WebRootPath, "images", pizza.HinhAnh);
                     if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
                 }
-
                 _context.Pizzas.Remove(pizza);
                 await _context.SaveChangesAsync();
                 TempData["Success"] = "🗑️ Xóa pizza thành công!";
             }
-            return RedirectToAction(nameof(Pizza));
+            return RedirectToAction("Pizza", "QuanLy");
         }
 
         // ======================== DASHBOARD ========================
@@ -267,7 +295,7 @@ namespace WebBanPizza.Controllers
             ViewBag.HoanTat = list.Count(d => d.TrangThai == "Hoàn tất");
 
             var doanhThuTheoNgay = list
-                .GroupBy(d => d.NgayDat!.Value.Date)
+                .GroupBy(d => d.NgayDat.Value.Date)
                 .Select(g => new { Ngay = g.Key.ToString("dd/MM/yyyy"), Tong = g.Sum(x => x.TongTien) })
                 .OrderBy(x => DateTime.ParseExact(x.Ngay, "dd/MM/yyyy", null))
                 .ToList();
@@ -276,7 +304,7 @@ namespace WebBanPizza.Controllers
             return View();
         }
 
-        // ======================== QUẢN LÝ MÃ GIẢM GIÁ ========================
+        // ======================== COUPON ========================
         [HttpGet]
         public async Task<IActionResult> Coupon()
         {
@@ -300,7 +328,7 @@ namespace WebBanPizza.Controllers
 
             if (string.IsNullOrWhiteSpace(c.Ma))
                 ModelState.AddModelError(nameof(c.Ma), "Nhập mã.");
-            if (c.GiamGiaPhanTram is null || c.GiamGiaPhanTram < 1 || c.GiamGiaPhanTram > 100)
+            if (!c.GiamGiaPhanTram.HasValue || c.GiamGiaPhanTram < 1 || c.GiamGiaPhanTram > 100)
                 ModelState.AddModelError(nameof(c.GiamGiaPhanTram), "Phần trăm 1–100.");
             if (!ModelState.IsValid) return View(c);
 
@@ -333,7 +361,7 @@ namespace WebBanPizza.Controllers
 
             if (string.IsNullOrWhiteSpace(c.Ma))
                 ModelState.AddModelError(nameof(c.Ma), "Nhập mã.");
-            if (c.GiamGiaPhanTram is null || c.GiamGiaPhanTram < 1 || c.GiamGiaPhanTram > 100)
+            if (!c.GiamGiaPhanTram.HasValue || c.GiamGiaPhanTram < 1 || c.GiamGiaPhanTram > 100)
                 ModelState.AddModelError(nameof(c.GiamGiaPhanTram), "Phần trăm 1–100.");
             if (!ModelState.IsValid) return View(c);
 
@@ -364,12 +392,12 @@ namespace WebBanPizza.Controllers
             return RedirectToAction(nameof(Coupon));
         }
 
-        // ======================== LỊCH SỬ ĐƠN HÀNG CỦA USER ========================
+        // ======================== LỊCH SỬ ĐƠN HÀNG USER ========================
         [HttpGet]
         public async Task<IActionResult> Index()
         {
             var uid = HttpContext.Session.GetInt32("UserId");
-            if (uid == null) return RedirectToAction("DangNhap", "Account");
+            if (!uid.HasValue) return RedirectToAction("DangNhap", "Account");
 
             var donHangs = await _context.DonHangs
                 .Include(d => d.User)
@@ -382,11 +410,11 @@ namespace WebBanPizza.Controllers
         }
 
         // ======================== HELPER LƯU ẢNH ========================
-        private async Task<string?> SaveImageAsync(IFormFile? file, string? oldName)
+        private async Task<string> SaveImageAsync(IFormFile file, string oldName)
         {
             if (file == null || file.Length == 0) return oldName;
 
-            var ext = Path.GetExtension(file.FileName).ToLower();
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
             var allowed = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
             if (!allowed.Contains(ext))
             {
@@ -406,8 +434,10 @@ namespace WebBanPizza.Controllers
                 if (System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
             }
 
-            var newName = $"{Guid.NewGuid()}{ext}";
-            var savePath = Path.Combine(_env.WebRootPath, "images", newName);
+            var newName = Guid.NewGuid().ToString("N") + ext;
+            var dir = Path.Combine(_env.WebRootPath, "images");
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            var savePath = Path.Combine(dir, newName);
             using (var stream = System.IO.File.Create(savePath))
             {
                 await file.CopyToAsync(stream);

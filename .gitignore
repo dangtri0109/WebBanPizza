@@ -17,3 +17,5 @@ wwwroot/uploads/
 # Config secrets
 appsettings.Development.json
 appsettings.Production.json
+WebBanPizza/wwwroot/images/*
+!WebBanPizza/wwwroot/images/default.jpg

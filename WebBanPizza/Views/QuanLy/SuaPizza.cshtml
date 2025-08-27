@@ -31,7 +31,7 @@
                             <label class="form-label fw-600">Giá</label>
                             <div class="input-group">
                                 <span class="input-group-text">₫</span>
-                                <input asp-for="Gia" class="form-control" id="giaField" />
+                                <input asp-for="Gia" class="form-control" id="giaField" inputmode="decimal" autocomplete="off" min="0" step="1000" />
                             </div>
                             <span asp-validation-for="Gia" class="text-danger small"></span>
                         </div>
@@ -40,6 +40,17 @@
                             <label class="form-label fw-600">Danh mục</label>
                             <select asp-for="DanhMucId" asp-items="ViewBag.DanhMucs" class="form-select"></select>
                             <span asp-validation-for="DanhMucId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Kích thước S/M/L -->
+                        <div class="col-md-3">
+                            <label class="form-label fw-600">Kích thước</label>
+                            <select asp-for="KichThuoc" class="form-select">
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                            </select>
+                            <span asp-validation-for="KichThuoc" class="text-danger small"></span>
                         </div>
                     </div>
 
@@ -72,6 +83,7 @@
                         <div class="dz-in">
                             <div class="dz-icon">📷</div>
                             <div>Thả ảnh vào đây hoặc <span class="link">chọn ảnh</span></div>
+                            <div class="small text-muted mt-1">JPG/PNG/WebP • ≤ 2MB</div>
                         </div>
                         <img id="preview" class="img-preview d-none" alt="preview" />
                     </label>
@@ -92,12 +104,16 @@
     <script>
         // Format giá
         const gia = document.getElementById('giaField');
-        gia?.addEventListener('input', () => {
-            let v = gia.value.replace(/[^\d.]/g, '');
-            const p = v.split('.');
-            if (p.length > 2) v = p[0] + '.' + p.slice(1).join('');
-            gia.value = v;
-        });
+        if (gia) {
+            gia.addEventListener('input', () => {
+                const pos = gia.selectionStart;
+                let v = gia.value.replace(/[^\d.]/g, '');
+                const parts = v.split('.');
+                if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
+                gia.value = v;
+                try { gia.setSelectionRange(pos, pos); } catch {}
+            });
+        }
 
         // Đếm mô tả
         const mota = document.getElementById('motaField'), c = document.getElementById('motaCount');
