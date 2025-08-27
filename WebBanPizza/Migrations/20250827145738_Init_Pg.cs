@@ -5,7 +5,7 @@
 namespace WebBanPizza.Migrations
 {
     /// <inheritdoc />
-    public partial class AddKhuyenMaiFieldsToDonHang : Migration
+    public partial class Init_Pg : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

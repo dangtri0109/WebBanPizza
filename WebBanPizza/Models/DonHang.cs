@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebBanPizza.Models;
 
@@ -18,10 +20,9 @@ public partial class DonHang
     public bool DaThanhToan { get; set; }
     public string? DiaChiGiao { get; set; }
     public string? TenNguoiNhan { get; set; }
+    public string? SdtnguoiNhan { get; set; }
+    public decimal PhiShip { get; set; }
 
-    public string? SdtnguoiNhan { get; set; } // tên gốc từ DB
-
-    // ✅ Alias để code cũ gọi được SDTNguoiNhan
     [NotMapped]
     public string? SDTNguoiNhan
     {
@@ -29,13 +30,15 @@ public partial class DonHang
         set => SdtnguoiNhan = value;
     }
 
-    public decimal PhiShip { get; set; }
-
     public virtual ICollection<ChiTietDonHang> ChiTietDonHangs { get; set; } = new List<ChiTietDonHang>();
     public virtual Coupon? Coupon { get; set; }
     public virtual DiaChi? DiaChi { get; set; }
     public virtual ICollection<LichSuTrangThaiDonHang> LichSuTrangThaiDonHangs { get; set; } = new List<LichSuTrangThaiDonHang>();
     public virtual PhuongThucThanhToan? PhuongThuc { get; set; }
-    public virtual NguoiDung? Shipper { get; set; }
+
+    [ForeignKey("UserId")]
     public virtual NguoiDung? User { get; set; }
+
+    [ForeignKey("ShipperId")]
+    public virtual NguoiDung? Shipper { get; set; }
 }

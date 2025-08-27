@@ -2,9 +2,9 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebBanPizza.Models;
 
 #nullable disable
@@ -12,8 +12,8 @@ using WebBanPizza.Models;
 namespace WebBanPizza.Migrations
 {
     [DbContext(typeof(PizzaDbContext))]
-    [Migration("20250808161449_AddDaThanhToanToDonHang")]
-    partial class AddDaThanhToanToDonHang
+    [Migration("20250827101103_InitPostgres")]
+    partial class InitPostgres
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,32 +21,35 @@ namespace WebBanPizza.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.8")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("WebBanPizza.Models.ChiTietDonHang", b =>
                 {
                     b.Property<int>("ChiTietId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChiTietId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ChiTietId"));
 
                     b.Property<int?>("DonHangId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    b.Property<string>("GhiChu")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<decimal>("Gia")
                         .HasColumnType("decimal(10, 2)");
 
                     b.Property<int?>("PizzaId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("SoLuong")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("ChiTietId")
-                        .HasName("PK__ChiTietD__B117E9CAEF7626C3");
+                    b.HasKey("ChiTietId");
 
                     b.HasIndex("DonHangId");
 
@@ -59,53 +62,48 @@ namespace WebBanPizza.Migrations
                 {
                     b.Property<int>("CouponId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CouponId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CouponId"));
 
                     b.Property<int?>("GiamGiaPhanTram")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Ma")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("NgayHetHan")
-                        .HasColumnType("datetime");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("CouponId")
-                        .HasName("PK__Coupon__384AF1BA74FCFB76");
+                    b.HasKey("CouponId");
 
-                    b.ToTable("Coupon", (string)null);
+                    b.ToTable("Coupons");
                 });
 
-            modelBuilder.Entity("WebBanPizza.Models.DanhGium", b =>
+            modelBuilder.Entity("WebBanPizza.Models.DanhGia", b =>
                 {
                     b.Property<int>("DanhGiaId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DanhGiaId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DanhGiaId"));
 
                     b.Property<string>("BinhLuan")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("NgayDanhGia")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("PizzaId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("SoSao")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("DanhGiaId")
-                        .HasName("PK__DanhGia__52C0CA0522F98AD3");
+                    b.HasKey("DanhGiaId");
 
                     b.HasIndex("PizzaId");
 
@@ -118,97 +116,115 @@ namespace WebBanPizza.Migrations
                 {
                     b.Property<int>("DanhMucId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DanhMucId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DanhMucId"));
 
                     b.Property<string>("TenDanhMuc")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("text");
 
-                    b.HasKey("DanhMucId")
-                        .HasName("PK__DanhMuc__1C53A59BC6C42238");
+                    b.HasKey("DanhMucId");
 
-                    b.ToTable("DanhMuc", (string)null);
+                    b.ToTable("DanhMucs");
                 });
 
             modelBuilder.Entity("WebBanPizza.Models.DiaChi", b =>
                 {
                     b.Property<int>("DiaChiId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DiaChiId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DiaChiId"));
 
                     b.Property<string>("DiaChiChiTiet")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("text");
+
+                    b.Property<string>("Duong")
+                        .HasColumnType("text");
+
+                    b.Property<string>("GhiChu")
+                        .HasColumnType("text");
+
+                    b.Property<string>("HoTen")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("MacDinh")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("QuanHuyen")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Sdt")
+                        .HasColumnType("text");
 
                     b.Property<string>("SoDienThoai")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("text");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("DiaChiId")
-                        .HasName("PK__DiaChi__94E668C6D2B90B3C");
+                    b.HasKey("DiaChiId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("DiaChi", (string)null);
+                    b.ToTable("DiaChis");
                 });
 
             modelBuilder.Entity("WebBanPizza.Models.DonHang", b =>
                 {
                     b.Property<int>("DonHangId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DonHangId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DonHangId"));
 
                     b.Property<int?>("CouponId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("DaThanhToan")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("DiaChiGiao")
+                        .HasColumnType("text");
 
                     b.Property<int?>("DiaChiId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("MaKhuyenMai")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("NgayDat")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("PhiShip")
+                        .HasColumnType("numeric");
 
                     b.Property<int?>("PhuongThucId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SdtnguoiNhan")
+                        .HasColumnType("text");
 
                     b.Property<int?>("ShipperId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("SoTienGiam")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("TenNguoiNhan")
+                        .HasColumnType("text");
 
                     b.Property<decimal?>("TongTien")
-                        .HasColumnType("decimal(10, 2)");
+                        .HasColumnType("numeric");
 
                     b.Property<string>("TrangThai")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasDefaultValue("Chờ xử lý");
+                        .HasColumnType("text");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("DonHangId")
-                        .HasName("PK__DonHang__D159F4BE71CB6806");
+                    b.HasKey("DonHangId");
 
                     b.HasIndex("CouponId");
 
@@ -220,182 +236,158 @@ namespace WebBanPizza.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("DonHang", (string)null);
+                    b.ToTable("DonHangs");
                 });
 
             modelBuilder.Entity("WebBanPizza.Models.GioHang", b =>
                 {
                     b.Property<int>("GioHangId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GioHangId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("GioHangId"));
 
                     b.Property<int?>("PizzaId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("SoLuong")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("GioHangId")
-                        .HasName("PK__GioHang__4242286D94FA22C6");
+                    b.HasKey("GioHangId");
 
                     b.HasIndex("PizzaId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GioHang", (string)null);
+                    b.ToTable("GioHangs");
                 });
 
             modelBuilder.Entity("WebBanPizza.Models.LichSuTrangThaiDonHang", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("DonHangId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("ThoiGian")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("TrangThai")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("PK__LichSuTr__3214EC07A5BA47C8");
+                    b.HasKey("Id");
 
                     b.HasIndex("DonHangId");
 
-                    b.ToTable("LichSuTrangThaiDonHang", (string)null);
+                    b.ToTable("LichSuTrangThaiDonHangs");
                 });
 
             modelBuilder.Entity("WebBanPizza.Models.NguoiDung", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("Email")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("text");
 
                     b.Property<string>("HoTen")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("text");
 
                     b.Property<string>("MatKhau")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("text");
 
                     b.Property<string>("VaiTro")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("text");
 
-                    b.HasKey("UserId")
-                        .HasName("PK__NguoiDun__1788CC4CD3F8AB1B");
+                    b.HasKey("UserId");
 
-                    b.HasIndex(new[] { "Email" }, "UQ__NguoiDun__A9D105349FAAB1B1")
-                        .IsUnique()
-                        .HasFilter("[Email] IS NOT NULL");
-
-                    b.ToTable("NguoiDung", (string)null);
+                    b.ToTable("NguoiDungs");
                 });
 
             modelBuilder.Entity("WebBanPizza.Models.PhuongThucThanhToan", b =>
                 {
                     b.Property<int>("PhuongThucId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PhuongThucId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PhuongThucId"));
 
                     b.Property<string>("TenPhuongThuc")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("text");
 
-                    b.HasKey("PhuongThucId")
-                        .HasName("PK__PhuongTh__1E306C6372D4D71D");
+                    b.HasKey("PhuongThucId");
 
-                    b.ToTable("PhuongThucThanhToan", (string)null);
+                    b.ToTable("PhuongThucThanhToans");
                 });
 
             modelBuilder.Entity("WebBanPizza.Models.Pizza", b =>
                 {
                     b.Property<int>("PizzaId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PizzaId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PizzaId"));
 
                     b.Property<int?>("DanhMucId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("Gia")
-                        .HasColumnType("decimal(10, 2)");
+                        .HasColumnType("numeric");
 
                     b.Property<string>("HinhAnh")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("KichThuoc")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("text");
 
                     b.Property<string>("MoTa")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Ten")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("text");
 
-                    b.HasKey("PizzaId")
-                        .HasName("PK__Pizza__0B6012DDF4BD9403");
+                    b.HasKey("PizzaId");
 
                     b.HasIndex("DanhMucId");
 
-                    b.ToTable("Pizza", (string)null);
+                    b.ToTable("Pizzas");
                 });
 
             modelBuilder.Entity("WebBanPizza.Models.ChiTietDonHang", b =>
                 {
                     b.HasOne("WebBanPizza.Models.DonHang", "DonHang")
                         .WithMany("ChiTietDonHangs")
-                        .HasForeignKey("DonHangId")
-                        .HasConstraintName("FK__ChiTietDo__DonHa__6477ECF3");
+                        .HasForeignKey("DonHangId");
 
                     b.HasOne("WebBanPizza.Models.Pizza", "Pizza")
                         .WithMany("ChiTietDonHangs")
-                        .HasForeignKey("PizzaId")
-                        .HasConstraintName("FK__ChiTietDo__Pizza__656C112C");
+                        .HasForeignKey("PizzaId");
 
                     b.Navigation("DonHang");
 
                     b.Navigation("Pizza");
                 });
 
-            modelBuilder.Entity("WebBanPizza.Models.DanhGium", b =>
+            modelBuilder.Entity("WebBanPizza.Models.DanhGia", b =>
                 {
                     b.HasOne("WebBanPizza.Models.Pizza", "Pizza")
                         .WithMany("DanhGia")
-                        .HasForeignKey("PizzaId")
-                        .HasConstraintName("FK__DanhGia__PizzaId__66603565");
+                        .HasForeignKey("PizzaId");
 
                     b.HasOne("WebBanPizza.Models.NguoiDung", "User")
                         .WithMany("DanhGia")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK__DanhGia__UserId__6754599E");
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Pizza");
 
@@ -406,8 +398,7 @@ namespace WebBanPizza.Migrations
                 {
                     b.HasOne("WebBanPizza.Models.NguoiDung", "User")
                         .WithMany("DiaChis")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK__DiaChi__UserId__68487DD7");
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -416,28 +407,25 @@ namespace WebBanPizza.Migrations
                 {
                     b.HasOne("WebBanPizza.Models.Coupon", "Coupon")
                         .WithMany("DonHangs")
-                        .HasForeignKey("CouponId")
-                        .HasConstraintName("FK__DonHang__CouponI__6C190EBB");
+                        .HasForeignKey("CouponId");
 
                     b.HasOne("WebBanPizza.Models.DiaChi", "DiaChi")
                         .WithMany("DonHangs")
-                        .HasForeignKey("DiaChiId")
-                        .HasConstraintName("FK__DonHang__DiaChiI__6A30C649");
+                        .HasForeignKey("DiaChiId");
 
                     b.HasOne("WebBanPizza.Models.PhuongThucThanhToan", "PhuongThuc")
                         .WithMany("DonHangs")
-                        .HasForeignKey("PhuongThucId")
-                        .HasConstraintName("FK__DonHang__PhuongT__6B24EA82");
+                        .HasForeignKey("PhuongThucId");
 
                     b.HasOne("WebBanPizza.Models.NguoiDung", "Shipper")
                         .WithMany("DonHangShippers")
                         .HasForeignKey("ShipperId")
-                        .HasConstraintName("FK_DonHang_Shipper");
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("WebBanPizza.Models.NguoiDung", "User")
                         .WithMany("DonHangUsers")
                         .HasForeignKey("UserId")
-                        .HasConstraintName("FK__DonHang__UserId__693CA210");
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Coupon");
 
@@ -454,13 +442,11 @@ namespace WebBanPizza.Migrations
                 {
                     b.HasOne("WebBanPizza.Models.Pizza", "Pizza")
                         .WithMany("GioHangs")
-                        .HasForeignKey("PizzaId")
-                        .HasConstraintName("FK__GioHang__PizzaId__6EF57B66");
+                        .HasForeignKey("PizzaId");
 
                     b.HasOne("WebBanPizza.Models.NguoiDung", "User")
                         .WithMany("GioHangs")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK__GioHang__UserId__6E01572D");
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Pizza");
 
@@ -471,8 +457,7 @@ namespace WebBanPizza.Migrations
                 {
                     b.HasOne("WebBanPizza.Models.DonHang", "DonHang")
                         .WithMany("LichSuTrangThaiDonHangs")
-                        .HasForeignKey("DonHangId")
-                        .HasConstraintName("FK__LichSuTra__DonHa__6FE99F9F");
+                        .HasForeignKey("DonHangId");
 
                     b.Navigation("DonHang");
                 });
@@ -481,8 +466,7 @@ namespace WebBanPizza.Migrations
                 {
                     b.HasOne("WebBanPizza.Models.DanhMuc", "DanhMuc")
                         .WithMany("Pizzas")
-                        .HasForeignKey("DanhMucId")
-                        .HasConstraintName("FK__Pizza__DanhMucId__70DDC3D8");
+                        .HasForeignKey("DanhMucId");
 
                     b.Navigation("DanhMuc");
                 });

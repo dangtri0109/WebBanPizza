@@ -1,28 +1,32 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using WebBanPizza.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Bắt buộc cho Session
+// ✅ Cấu hình Session
 builder.Services.AddDistributedMemoryCache();
 
-// ✅ Đăng ký Session (có thể cấu hình thêm)
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(60); // thời gian sống
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
     options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true; // cần thiết để hoạt động khi có GDPR
+    options.Cookie.IsEssential = true;
 });
 
-// DbContext
+// ✅ Sửa lại đúng DbContext tên PizzaDbContext
 builder.Services.AddDbContext<PizzaDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("PizzaDbContext")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Pipeline
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -31,12 +35,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
-// ⬇️ ⬇️ Đặt Session SAU UseRouting và TRƯỚC Authorization/Map
 app.UseSession();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(
