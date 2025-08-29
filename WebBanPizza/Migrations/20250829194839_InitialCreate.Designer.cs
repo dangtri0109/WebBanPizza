@@ -12,15 +12,15 @@ using WebBanPizza.Models;
 namespace WebBanPizza.Migrations
 {
     [DbContext(typeof(PizzaDbContext))]
-    [Migration("20250829190026_ReInit")]
-    partial class ReInit
+    [Migration("20250829194839_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.8")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
