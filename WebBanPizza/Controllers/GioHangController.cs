@@ -101,7 +101,7 @@ namespace WebBanPizza.Controllers
             if (string.IsNullOrWhiteSpace(maGiamGia))
                 return RedirectToAction(nameof(Index));
 
-            var today = DateTime.Today;
+            var today = DateTime.UtcNow.Date;
             var coupon = _context.Coupons.FirstOrDefault(c =>
                 c.Ma == maGiamGia && (!c.NgayHetHan.HasValue || c.NgayHetHan.Value.Date >= today));
 
@@ -156,7 +156,7 @@ namespace WebBanPizza.Controllers
             var dh = new DonHang
             {
                 UserId = uid.Value,
-                NgayDat = DateTime.Now,
+                NgayDat = DateTime.UtcNow,
                 TongTien = tongThanhToan,
                 TrangThai = "Chờ xử lý",
                 CouponId = couponId,

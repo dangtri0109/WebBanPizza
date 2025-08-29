@@ -12,8 +12,8 @@ using WebBanPizza.Models;
 namespace WebBanPizza.Migrations
 {
     [DbContext(typeof(PizzaDbContext))]
-    [Migration("20250827101103_InitPostgres")]
-    partial class InitPostgres
+    [Migration("20250829190026_ReInit")]
+    partial class ReInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

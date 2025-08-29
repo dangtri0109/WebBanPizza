@@ -1,6 +1,5 @@
 ﻿@model WebBanPizza.Models.PizzaFilterVM
 
-<h3>Lọc Pizza</h3>
 <form method="get" asp-action="Loc" class="row g-2 mb-3">
     <div class="col-md-3">
         <input name="keyword" value="@Model.Keyword" class="form-control" placeholder="Từ khóa..." />
@@ -31,7 +30,7 @@
         <input name="giaMax" type="number" value="@(Model.GiaMax)" class="form-control" placeholder="Giá đến" />
     </div>
     <div class="col-md-1">
-        <button class="btn btn-primary w-100">Lọc</button>
+        <button class="btn btn-primary w-100">Tìm</button>
     </div>
 </form>
 
